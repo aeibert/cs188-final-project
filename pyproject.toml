@@ -8,6 +8,7 @@ dependencies = [
     "flask>=3.1.2",
     "flask-restful>=0.3.10",
     "omdb>=0.10.1",
+    "tmdbv3api>=1.9.0",
 ]
 
 [dependency-groups]

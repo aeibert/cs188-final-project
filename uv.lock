@@ -99,6 +99,7 @@ dependencies = [
     { name = "flask" },
     { name = "flask-restful" },
     { name = "omdb" },
+    { name = "tmdbv3api" },
 ]
 
 [package.dev-dependencies]
@@ -111,6 +112,7 @@ requires-dist = [
     { name = "flask", specifier = ">=3.1.2" },
     { name = "flask-restful", specifier = ">=0.3.10" },
     { name = "omdb", specifier = ">=0.10.1" },
+    { name = "tmdbv3api", specifier = ">=1.9.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -325,6 +327,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68a0e064b6af791aa332cf192da575fd474ed7d6f16a2/six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81", size = 34031, upload-time = "2024-12-04T17:35:28.174Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
+]
+
+[[package]]
+name = "tmdbv3api"
+version = "1.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d7/1b/b1c4d45e7df81e92c92944f4835af2caa5d7fe55c61f717255da6e6c9c8e/tmdbv3api-1.9.0.tar.gz", hash = "sha256:504c5da6b99c4516ff160a01576112d097f209c0534f943c15c4b56cbd92c33b", size = 26563, upload-time = "2023-08-14T11:43:24.748Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/35/fb/9d575292bb7794a7a85bcdbf6c09928aae5ca2ae9f684f7fbbd902e281c4/tmdbv3api-1.9.0-py3-none-any.whl", hash = "sha256:2bcd8c6e8902397860715a71045f200ecc3ee06804ecf786cb4c1e09b2deeba8", size = 25500, upload-time = "2023-08-14T11:43:23.482Z" },
 ]
 
 [[package]]
