@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Find Your Next…</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#a78bfa; --bg2:#60a5fa; --ink:#1d2230; --muted:#6b7280; --panel:#ffffff;
+      --ring:rgba(96,165,250,.35); --shadow:0 18px 45px rgba(17,24,39,.15); --radius:18px;
+      --btn:#5b55f7; --btn-hover:#4a44ea; --border:#e7e9f0;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;}
+
+    header{color:#fff; padding:72px 16px 120px; text-align:center;}
+    header h1{font-family:'Poppins',sans-serif; font-weight:700; margin:0 0 8px; font-size:56px; letter-spacing:.3px}
+    header p{margin:0; opacity:.95; font-size:18px}
+
+    .wrap{max-width:1040px; margin:-84px auto 40px; padding:0 18px;}
+    .card{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--border); padding:26px;}
+
+    .search-head{font-family:'Poppins',sans-serif; text-align:center; font-size:26px; margin:6px 0 18px; color:#4438ca}
+    .search-form{display:grid; grid-template-columns:1fr 1fr 3fr auto auto; gap:12px; align-items:end}
+    .field label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
+    select,input{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); outline:none; background:#fff; font-size:16px}
+    select:focus,input:focus{box-shadow:0 0 0 6px var(--ring)}
+    .btn{padding:13px 22px; border-radius:12px; border:none; background:var(--btn); color:#fff; font-weight:700; cursor:pointer; transition:.15s transform ease, .2s filter;}
+    .btn:hover{background:var(--btn-hover); transform:translateY(-1px)}
+
+    .micro{margin-top:8px; color:var(--muted); font-size:12px; text-align:center}
+
+    footer{padding:32px 12px 48px; text-align:center; color:#fff; opacity:.9}
+
+    @media (max-width:900px){ .search-form{grid-template-columns:1fr; header h1{font-size:44px}} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Find Your Next…</h1>
+    <p>Book or Movie — Discover stories you'll love!</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2 class="search-head">What are you looking for?</h2>
+
+      <form class="search-form" action="results.html" method="get" novalidate>
+        <div class="field">
+          <label for="inputKind">I'm entering</label>
+          <select id="inputKind" name="inputKind">
+            <option value="book">Book</option>
+            <option value="movie">Movie</option>
+          </select>
+        </div>
+      
+        <div class="field">
+          <label for="targetKind">Recommend me</label>
+          <select id="targetKind" name="targetKind">
+            <option value="book">Books</option>
+            <option value="movie">Movies</option>
+          </select>
+        </div>
+      
+        <div class="field">
+          <label for="q">Title</label>
+          <input id="q" name="q" type="text" placeholder="Enter your favorite title…" required />
+        </div>
+      
+        <div class="field">
+          <label for="limit">Show</label>
+          <select id="limit" name="limit">
+            <option value="3">3</option>
+            <option value="6" selected>6</option>
+            <option value="9">9</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+      
+        <button class="btn" type="submit">Search</button>
+      </form>
+      
+
+      <p class="micro">Tip: Enter a <em>Book</em> and get <em>Movie</em> recs — or the other way around!</p>
+    </section>
+  </main>
+
+  <footer>© 2025 Find Your Next…</footer>
+
+  <script>
+    const inputKind = document.getElementById('inputKind');
+    const targetKind = document.getElementById('targetKind');
+    const q = document.getElementById('q');
+
+    function refreshUI(){
+      const entering = inputKind.value;
+      q.placeholder = entering === 'book' ? 'e.g., The Hobbit' : 'e.g., Interstellar';
+      if (targetKind.value === entering){
+        targetKind.value = entering === 'book' ? 'movie' : 'book';
+      }
+    }
+    inputKind.addEventListener('change', refreshUI);
+    refreshUI();
+  </script>
+</body>
+</html>
