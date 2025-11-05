@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="style.css">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -145,16 +147,39 @@
       const slice = list.slice(0, limit);
       if (!slice.length){ emptyEl.style.display='block'; return; }
       emptyEl.style.display='none';
-      for (const it of slice){
-        const card = document.createElement('article'); card.className='item';
-        const img = document.createElement('img'); img.className='thumb'; img.alt=`${pretty(it.kind)} cover for ${it.title}`; img.src=it.poster;
-        const pad = document.createElement('div'); pad.className='pad';
-        const t = document.createElement('div'); t.className='title'; t.textContent=it.title;
-        const m = document.createElement('div'); m.className='meta'; m.textContent=`${pretty(it.kind)} • ${it.year || ''}`;
-        const r = document.createElement('div'); r.className='meta'; r.textContent=(it.rating!=null)?`Rating: ${it.rating}`:'';
-        pad.append(t,m,r); card.append(img,pad); resultsEl.append(card);
+      for (const it of slice) {
+        const a = document.createElement('a');
+        a.className = 'item';
+        // Build the URL to detail page with query params
+        const qp = new URLSearchParams({
+          kind: it.kind,
+          id: it.id || '',                 // later: real OMDb imdbID or BigBook id
+          title: it.title,
+          year: String(it.year || ''),
+          rating: String(it.rating ?? ''),
+          poster: it.poster || '',
+          desc: it.description || 'A great story awaits…',
+          genres: (it.genres || []).join(', ')
+        });
+        a.href = `detail.html?${qp.toString()}`;
+
+        // Card body
+        const img = document.createElement('img');
+        img.className = 'thumb';
+        img.alt = `${pretty(it.kind)} cover for ${it.title}`;
+        img.src = it.poster;
+
+        const pad = document.createElement('div'); pad.className = 'pad';
+        const t = document.createElement('div'); t.className = 'title'; t.textContent = it.title;
+        const m = document.createElement('div'); m.className = 'meta'; m.textContent = `${pretty(it.kind)} • ${it.year || ''}`;
+        const r = document.createElement('div'); r.className = 'meta'; r.textContent = (it.rating != null) ? `Rating: ${it.rating}` : '';
+
+        pad.append(t, m, r);
+        a.append(img, pad);
+        resultsEl.append(a);
       }
-    }
+
+          }
 
     // Wire controls
     sortSel.addEventListener('change', ()=>{
