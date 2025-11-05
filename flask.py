@@ -10,7 +10,7 @@ OMDB_API_KEY = "35a0d4cf"
 BIGBOOK_API_KEY = "dec57ed47cb341449df3b7ab2ce678f2"
 
 # === Database Connection ===
-# Adjust with your actual connection string
+# Adjust with actual
 conn_str = (
     "Driver={SQL Server};"
     "Server=YOUR_SERVER_NAME;"
