@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="style.css">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -104,5 +106,80 @@
     inputKind.addEventListener('change', refreshUI);
     refreshUI();
   </script>
+
+<section class="featured">
+  <h2>Featured Movies</h2>
+  <div id="featured-container">
+    <img id="featured-poster" src="" alt="Movie Poster" />
+    <h3 id="featured-title"></h3>
+    <p id="featured-plot"></p>
+  </div>
+</section>
+<section class="featured">
+  <h2>Featured Movies</h2>
+  <div id="featured-grid" class="featured-grid" aria-live="polite">
+    <!-- cards will be injected here -->
+  </div>
+</section>
+
+<script>
+  /**
+   * Call this AFTER your API returns movies.
+   * @param {Array<{id?:string, kind?:'movie'|'book', title:string, plot?:string, poster?:string}>} movies
+   * @param {Object} opts
+   * @param {number} opts.count  how many to show (default 3)
+   * @param {boolean} opts.autoplay  reshuffle every N ms (default false)
+   * @param {number} opts.interval  ms between reshuffles (default 7000)
+   */
+  function setFeaturedMovies(movies = [], opts = {}) {
+    const grid = document.getElementById('featured-grid');
+    if (!grid) return;
+
+    const count = opts.count ?? 3;
+    const autoplay = opts.autoplay ?? false;
+    const interval = opts.interval ?? 7000;
+
+    function draw() {
+      grid.innerHTML = '';
+      // shuffle, then take N
+      const pool = [...movies].sort(() => Math.random() - 0.5).slice(0, count);
+
+      for (const m of pool) {
+        const card = document.createElement('a');
+        card.className = 'movie-card';
+        // build detail link (works before real IDs too)
+        const qp = new URLSearchParams({
+          kind: m.kind || 'movie',
+          id: m.id || '',
+          title: m.title || '',
+          poster: m.poster || '',
+          desc: (m.plot || '').slice(0, 240),
+        });
+        card.href = `detail.html?${qp.toString()}`;
+
+        card.innerHTML = `
+          <img src="${m.poster || 'https://via.placeholder.com/400x600.png?text=Poster'}"
+               alt="${m.title ? m.title + ' poster' : 'Poster'}">
+          <h3>${m.title || 'Untitled'}</h3>
+          <p>${m.plot ? m.plot : ''}</p>
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    draw();
+    if (autoplay) {
+      setInterval(draw, interval);
+    }
+  }
+
+  // Example usage (delete after wiring your API):
+  // fetch('/your-endpoint').then(r => r.json()).then(data => {
+  //   setFeaturedMovies(data.movies, { count: 3, autoplay: true, interval: 7000 });
+  // });
+</script>
+
+
+
 </body>
 </html>
