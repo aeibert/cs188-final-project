@@ -1,4 +1,4 @@
-from tmdbv3api import TMDb, Genre, Discover
+from tmdbv3api import TMDb, Genre, Discover, Movie, Search
 
 def main():
     tmdb = TMDb()
@@ -28,5 +28,35 @@ def main():
 
     except Exception as e:
         print(f"An error occurred: {e}")
+
+def recommendation(query, limit):
+    movie = Movie()
+    search = Search()
+    s = search.movies(query)
+    
+    # Check if the search returned any results
+    if not s:
+        print(f"No movies found for '{query}'")
+        return
+
+    first_result = s[0]
+    print(f"Found movie: {first_result.title} (ID: {first_result.id})")
+    
+    print(f"\n--- Finding {limit} recommendations ---")
+    recommendations = movie.recommendations(first_result.id)
+    
+    # Convert to a standard list to be able to slice it
+    recommendations_list = list(recommendations)
+    
+    # Slice the list to the desired limit
+    limited_recommendations = recommendations_list[:int(limit)]
+    
+    for recommendation in limited_recommendations:
+        print("%s (%s)" % (recommendation.title, recommendation.release_date))
+
 if __name__ == "__main__":
     main()
+    movie_to_search = "The Notebook"
+    number_of_recs = 5
+    
+    recommendation(movie_to_search, number_of_recs)
