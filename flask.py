@@ -2,21 +2,22 @@ from flask import Flask, request, jsonify
 import requests
 import pyodbc
 import os
+from dotenv import load_dotenv
+
+if "WEBSITE_HOSTNAME" not in os.environ:
+    # Development
+    load_dotenv(".secret.env")
+
+
+# We now load the connection string from the environment variable.
+CONNECTION_STRING = os.environ["AZURE_SQL_CONNECTIONSTRING"]
+
+# === API Keys ===
+TMDB_API_KEY = os.environ["TMDB_API_KEY"]
+BIGBOOK_API_KEY = os.environ["BIGBOOK_API_KEY"]
 
 app = Flask(__name__)
 
-# === API Keys ===
-OMDB_API_KEY = "35a0d4cf"
-BIGBOOK_API_KEY = "dec57ed47cb341449df3b7ab2ce678f2"
-
-# === Database Connection ===
-# Adjust with actual
-conn_str = (
-    "Driver={SQL Server};"
-    "Server=YOUR_SERVER_NAME;"
-    "Database=YOUR_DB_NAME;"
-    "Trusted_Connection=yes;"
-)
-
 def get_db_connection():
-    return pyodbc.connect(conn_str)
+    connection = pyodbc.connect(CONNECTION_STRING)
+    return connection
