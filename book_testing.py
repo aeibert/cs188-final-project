@@ -1,15 +1,24 @@
+import os
 import bigbookapi
 from bigbookapi.rest import ApiException
-def main():
-    # 1. Paste your Big Book API key here
-    API_KEY = "dec57ed47cb341449df3b7ab2ce678f2"
+from dotenv import load_dotenv  # Only needed locally
 
-    # 2. Set up the configuration
+def main():
+    # Load environment variables from .secret.env (only needed for local dev)
+    load_dotenv(".secret.env")
+
+    # Retrieve API key from environment variables
+    API_KEY = os.getenv("BIGBOOK_API_KEY")
+
+    if not API_KEY:
+        raise ValueError("API key not found. Make sure BIGBOOK_API_KEY is set in environment variables.")
+
+    # Set up the configuration
     configuration = bigbookapi.Configuration(
-        host = "https://api.bigbookapi.com"
+        host="https://api.bigbookapi.com"
     )
-    configuration.api_key['apiKey'] = API_KEY
-    configuration.api_key['headerApiKey'] = API_KEY
+    configuration.api_key["apiKey"] = API_KEY
+    configuration.api_key["headerApiKey"] = API_KEY
 
     try:
         with bigbookapi.ApiClient(configuration) as api_client:

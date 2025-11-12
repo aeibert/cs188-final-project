@@ -9,7 +9,7 @@ def get_tmdb_genre_id(book_genre_name):
     
     # 1. GET THIS FROM THE AZURE PORTAL
     # It will look something like: 
-    # 'driver={ODBC Driver 18 for SQL Server};server=tcp:your-server-name.database.windows.net,1433;...'
+    
     connection_string = os.environ["AZURE_SQL_CONNECTIONSTRING"]
     
     # 2. THIS IS YOUR SQL QUERY
