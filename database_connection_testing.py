@@ -1,4 +1,5 @@
 import pyodbc
+import os
 
 def get_tmdb_genre_id(book_genre_name):
     """
@@ -9,7 +10,7 @@ def get_tmdb_genre_id(book_genre_name):
     # 1. GET THIS FROM THE AZURE PORTAL
     # It will look something like: 
     # 'driver={ODBC Driver 18 for SQL Server};server=tcp:your-server-name.database.windows.net,1433;...'
-    connection_string ="Driver={ODBC Driver 18 for SQL Server};Server=tcp:sql-server-cs188-eibert-amelia.database.windows.net,1433;Database=cs188-final-project;Uid=sql-server-admin;Pwd=CS188-fall-2025;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    connection_string = os.environ["AZURE_SQL_CONNECTIONSTRING"]
     
     # 2. THIS IS YOUR SQL QUERY
     sql_query = "SELECT MovieGenre FROM Genre WHERE BookGenre = ?"
