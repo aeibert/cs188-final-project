@@ -2,15 +2,17 @@ import pyodbc
 from tmdbv3api import TMDb, Genre, Discover
 import bigbookapi # Your local package
 from pprint import pprint
+import os
+
 
 # --- API SETUPS (Fill these in) --------------------------------
 tmdb = TMDb()
-tmdb.api_key = 'd4dff7104608d6f3f1327157aeba5f7d'
+tmdb.api_key = ''
 discover = Discover()
 
 book_config = bigbookapi.Configuration(host="https://api.bigbookapi.com")
-book_config.api_key['apiKey'] = 'dec57ed47cb341449df3b7ab2ce678f2'
-book_config.api_key['headerApiKey'] = 'dec57ed47cb341449df3b7ab2ce678f2'
+book_config.api_key['apiKey'] = os.environ.get("BIGBOOK_API_KEY")
+book_config.api_key['headerApiKey'] = os.environ.get("BIGBOOK_API_KEY")
 # ---------------------------------------------------------------
 
 
@@ -19,7 +21,7 @@ def get_tmdb_genre_id(book_genre_name):
     Connects to the Azure SQL database.
     (This function is already correct and needs no changes)
     """
-    connection_string = "YOUR_AZURE_SQL_CONNECTION_STRING_HERE"
+    connection_string = os.environ["AZURE_SQL_CONNECTIONSTRING"]
     
     # This query is perfect for your new GenreMap table
     sql_query = "SELECT TMDbGenreID FROM GenreMap WHERE BookGenreName = ?"

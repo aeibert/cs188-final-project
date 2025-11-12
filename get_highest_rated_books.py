@@ -1,16 +1,15 @@
 import pyodbc
 import bigbookapi
 from bigbookapi.rest import ApiException
+import os
 from pprint import pprint
 
 # --- (Fill in your API keys and connection string) ---
 
 # Big Book API Setup
-API_KEY = "dec57ed47cb341449df3b7ab2ce678f2"
 book_config = bigbookapi.Configuration(host="https://api.bigbookapi.com")
-book_config.api_key['apiKey'] = API_KEY
-book_config.api_key['headerApiKey'] = API_KEY
-
+book_config.api_key['apiKey'] = os.environ.get("BIGBOOK_API_KEY")
+book_config.api_key['headerApiKey'] = os.environ.get("BIGBOOK_API_KEY")
 # Azure SQL Setup
 AZURE_CONNECTION_STRING = "YOUR_AZURE_SQL_CONNECTION_STRING_HERE"
 
