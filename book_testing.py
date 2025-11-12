@@ -1,5 +1,6 @@
 import bigbookapi
 from bigbookapi.rest import ApiException
+
 def main():
     # 1. Paste your Big Book API key here
     API_KEY = "dec57ed47cb341449df3b7ab2ce678f2"
@@ -16,8 +17,8 @@ def main():
             api_instance = bigbookapi.DefaultApi(api_client)
             
             # --- STEP 1: Search for a book to get a valid ID ---
-            print("--- Searching for 'Dune' ---")
-            search_query = 'Dune'
+            print("--- Searching for 'The Hobbit' ---")
+            search_query = 'The Notebook'
             
             search_response = api_instance.search_books(query=search_query, number=1)
             
@@ -37,6 +38,13 @@ def main():
                 if book_data.get('authors'):
                     print(f"Author:   {book_data['authors'][0].get('name')}")
                 print(f"Found ID: {real_book_id}")
+                
+                # book_info = api_instance.get_book_information(real_book_id)
+                # if book_info.get('genres'):
+                #     first_genre = book_info['genres'][0]
+                #     print(f"Genre: {first_genre}")
+                # else:
+                #     print("No genres found for this book.")
                 # --- End of Reader-Friendly Output ---
                 
                 if real_book_id:
@@ -58,7 +66,7 @@ def main():
                     print("Could not find an ID for the first book.")
 
             else:
-                print("Could not find 'Dune' to get a real ID.")
+                print("Could not find 'The Hobbit' to get a real ID.")
 
     except ApiException as e:
         print(f"\nAn error occurred: {e}")
