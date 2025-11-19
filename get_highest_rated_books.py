@@ -3,44 +3,24 @@ import bigbookapi
 from bigbookapi.rest import ApiException
 import os
 from pprint import pprint
+import csv  # <-- Import the CSV module
+import os.path # <-- Import this to check if the file exists
 
 # --- (Fill in your API keys and connection string) ---
 
 # Big Book API Setup
+# Make sure to set this environment variable in your terminal
+# export BIGBOOK_API_KEY='your_key_goes_here'
 book_config = bigbookapi.Configuration(host="https://api.bigbookapi.com")
 book_config.api_key['apiKey'] = os.environ.get("BIGBOOK_API_KEY")
 book_config.api_key['headerApiKey'] = os.environ.get("BIGBOOK_API_KEY")
+
 # Azure SQL Setup
 AZURE_CONNECTION_STRING = "YOUR_AZURE_SQL_CONNECTION_STRING_HERE"
 
 # -----------------------------------------------------
 
-def get_all_book_genres_from_db():
-    """
-    Queries your Azure SQL 'GenreMap' table and returns a list
-    of all unique book genre names.
-    """
-    sql_query = "SELECT BookGenreName FROM GenreMap"
-    genre_list = []
-    
-    try:
-        conn = pyodbc.connect(AZURE_CONNECTION_STRING)
-        cursor = conn.cursor()
-        cursor.execute(sql_query)
-        rows = cursor.fetchall()
-        
-        # Create a list from the first column of each row
-        genre_list = [row[0] for row in rows]
-            
-    except Exception as e:
-        print(f"Database error: {e}")
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
-            
-    return genre_list
+# (Your get_all_book_genres_from_db function is commented out, which is fine)
 
 def get_top_book_for_genre(genre_name):
     """
@@ -65,97 +45,17 @@ def get_top_book_for_genre(genre_name):
                 return None, f"No books found for '{genre_name}'"
                 
     except ApiException as e:
-        return None, f"API Error for '{genre_name}': {e}"
+        # Pass the full error message back as the 'title'
+        return None, f"API Error for '{genre_name}': {e.body}" 
+    except Exception as e:
+        return None, f"General Error for '{genre_name}': {e}"
 
 
 if __name__ == "__main__":
-    print("Finding the top-rated book for a few test genres...\n")
+    print("Starting API calls... Results will be saved to top_books_run_1.csv\n")
+    
+    # This is the list for your first run
     all_book_genres = [
-    'action',
-    'adventure',
-    'anthropology',
-    'astronomy',
-    'archaeology',
-    'architecture',
-    'art',
-    'aviation',
-    'biography',
-    'biology',
-    'business',
-    'chemistry',
-    'children',
-    'classics',
-    'contemporary',
-    'cookbook',
-    'crafts',
-    'crime',
-    'dystopia',
-    'economics',
-    'education',
-    'engineering',
-    'environment',
-    'erotica',
-    'essay',
-    'fairy tales',  # Fixed
-    'fantasy',
-    'fashion',
-    'feminism',
-    'fiction',
-    'finance',
-    'folklore',
-    'food',
-    'gaming',
-    'gardening',
-    'geography',
-    'geology',
-    'graphic novel',  # Fixed
-    'health',
-    'historical',
-    'historical fiction',  # Fixed
-    'history',
-    'horror',
-    'how to',  # Fixed
-    'humor',
-    'inspirational',
-    'journalism',
-    'law',
-    'literary fiction',  # Fixed
-    'literature',
-    'magical realism',  # Fixed
-    'manga',
-    'martial arts',  # Fixed
-    'mathematics',
-    'medicine',
-    'medieval',
-    'memoir',
-    'mystery',
-    'mythology',
-    'nature',
-    'nonfiction',
-    'novel',
-    'occult',
-    'paranormal',
-    'parenting',
-    'philosophy',
-    'physics',
-    'picture book',  # Fixed
-    'poetry',
-    'politics',
-    'programming',
-    'psychology',
-    'reference',
-    'relationships',
-    'religion',
-    'romance',
-    'science and technology',  # Fixed
-    'science fiction',  # Fixed
-    'self help',  # Fixed
-    'short stories',  # Fixed
-    'society',
-    'sociology',
-    'space',
-    'spirituality',
-    'sports',
     'text book',  # Fixed
     'thriller',
     'travel',
@@ -164,21 +64,37 @@ if __name__ == "__main__":
     'writing',
     'young adult'  # Fixed
 ]
-    # --- To run all genres (NOT RECOMMENDED ON FREE TIER) ---
-    #
-    # print("Fetching all genres from SQL... (This may take a while)")
-    # all_genres = get_all_book_genres_from_db()
-    # print(f"Found {len(all_genres)} genres. Starting API calls...")
-    #
-    # for genre in all_genres: 
-    #     book_id, title = get_top_book_for_genre(genre)
-    #     ...
-    # --------------------------------------------------------
 
-    for genre in all_book_genres:
-        book_id, title = get_top_book_for_genre(genre)
+    output_filename = "top_books_run_1.csv"
+    
+    # Check if the file already exists so we know whether to write the header
+    file_exists = os.path.isfile(output_filename)
+
+    # Open the file in 'append' mode ('a')
+    # This creates the file if it doesn't exist, or adds to it if it does.
+    # This is the safest way to save your data.
+    with open(output_filename, 'a', newline='', encoding='utf-8') as f:
         
-        if book_id:
-            print(f"  - {genre.capitalize()}: {title} (ID: {book_id})")
-        else:
-            print(f"  - {genre.capitalize()}: {title}") # This will print the error (e.g., "No books found")
+        # Create a CSV writer object
+        csv_writer = csv.writer(f)
+        
+        # If the file is new, write the header row
+        if not file_exists:
+            csv_writer.writerow(["genre", "book_id", "title_or_error"])
+
+        # Loop through your genres
+        for genre in all_book_genres:
+            book_id, title = get_top_book_for_genre(genre)
+            
+            # 1. Write the result to the CSV file IMMEDIATELY
+            csv_writer.writerow([genre, book_id, title])
+            
+            # 2. Print to the terminal so you can see the progress
+            if book_id:
+                print(f"  - SUCCESS: {genre.capitalize()} -> {title} (ID: {book_id})")
+            else:
+                # This will print the error message (e.g., "No books found")
+                print(f"  - FAILED:  {genre.capitalize()} -> {title}")
+                
+    print(f"\n...Finished. All results saved to {output_filename}")
+
