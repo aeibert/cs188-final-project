@@ -1,6 +1,6 @@
 # Find Your Next
+CS188: Software Engineering final project
 # Description
- CS188: Software Engineering final project
 # Authors
 Amelia E., Maia B. Kendal S., Najmo M.
 
