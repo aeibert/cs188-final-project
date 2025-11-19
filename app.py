@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from services.omdb_service import get_movies_by_genre, get_movie_genres
 from services.bigbook_service import get_book_genres, get_similar_books
-from database import log_search
+import pyodbc
+from database_search import log_search
+from config import CONNECTION_STRING
 
 app = Flask(__name__)
 
@@ -30,3 +32,29 @@ def recommend():
         results = []
 
     return jsonify(results)
+
+@app.route("/api/history")
+def history():
+    conn = pyodbc.connect(CONNECTION_STRING)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT TOP 50 title, search_type, timestamp
+        FROM SearchHistory
+        ORDER BY timestamp DESC
+    """)
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    history = [
+        {
+            "title": row[0],
+            "type": row[1],
+            "timestamp": row[2].isoformat()
+        }
+        for row in rows
+    ]
+
+    return jsonify(history)
+
