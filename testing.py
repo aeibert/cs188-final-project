@@ -2,31 +2,27 @@ import pyodbc
 import os
 from tmdbv3api import TMDb, Movie, Discover, Search
 import bigbookapi
-from bigbookapi.rest import ApiException
+#from bigbookapi.rest import ApiException
 from dotenv import load_dotenv
 load_dotenv(".secret.env")  # <--- This loads the variables from .env
 
 # --- CONFIGURATION ---------------------------------------------------------
-# 1. API KEYS
-TMDB_API_KEY = os.environ.get("TMDB_API_KEY")
-BIGBOOK_API_KEY = os.environ.get("BIGBOOK_API_KEY")
-
-# 2. AZURE CONNECTION STRING
+# Azure SQL Connection String
 AZURE_CONN_STRING = os.environ.get("AZURE_SQL_CONNECTIONSTRING")
 
 
 # --- SETUP -----------------------------------------------------------------
 # TMDb Setup
 tmdb = TMDb()
-tmdb.api_key = TMDB_API_KEY
+tmdb.api_key = os.environ.get("TMDB_API_KEY")
 movie_api = Movie()
 discover_api = Discover()
 search_api = Search()
 
 # Big Book API Setup
 book_config = bigbookapi.Configuration(host="https://api.bigbookapi.com")
-book_config.api_key['apiKey'] = BIGBOOK_API_KEY
-book_config.api_key['headerApiKey'] = BIGBOOK_API_KEY
+book_config.api_key['apiKey'] = os.environ.get("BIGBOOK_API_KEY")
+book_config.api_key['headerApiKey'] = os.environ.get("BIGBOOK_API_KEY")
 # ---------------------------------------------------------------------------
 
 def get_db_connection():
@@ -247,16 +243,11 @@ def get_movie_posters(movie_title):
 def get_book_cover_url(book_data):
     """
     Extracts the best available cover URL for a book.
-    Prioritizes the direct 'image' link (Cover ID) to avoid rate limits.
-    Falls back to ISBN if necessary.
+    Gets ISBN from the book data and constructs the Open Library cover URL.
+    Fallback to a placeholder image if no cover is found.
     """
-    # 1. BEST OPTION: Use the direct link provided by Big Book API
-    # This usually looks like: https://covers.openlibrary.org/b/id/12345-M.jpg
-    # This uses the "Cover ID" which is NOT rate-limited.
-    if book_data.get('image'):
-        return book_data.get('image')
 
-    # 2. FALLBACK OPTION: Construct URL using ISBN
+    # Construct URL using ISBN
     # This is rate-limited to 100 requests / 5 mins.
     identifiers = book_data.get('identifiers')
     if identifiers:
@@ -275,18 +266,17 @@ def get_book_cover_url(book_data):
 # ===========================================================================
 if __name__ == "__main__":
     # Test 1: Movie -> Movie
-    #recommend_movies_from_movie("The Matrix")
+    recommend_movies_from_movie("The Matrix")
 
     # Test 2: Book -> Book
-    
-    #recommend_books_from_book("Dune")
+    recommend_books_from_book("Dune")
 
-    # Test 3: Movie -> Book (Reverse Lookup)
+    # Test 3: Movie -> Book (Reverse Lookup), need to be connected to Azure SQL
     recommend_books_from_movie("The Notebook") 
 
-    # Test 4: Book -> Movie (Dropdown Input)
+    # Test 4: Book -> Movie (Dropdown Input), need to be connected to Azure SQL
     # This simulates the user selecting "fantasy" from your dropdown
-    #recommend_movies_from_genre_dropdown("fantasy")
+    recommend_movies_from_genre_dropdown("fantasy")
 
     #Test Poster Function
-    #get_movie_posters("The Matrix")
+    get_movie_posters("Harry Potter and the Sorcerer's Stone")
