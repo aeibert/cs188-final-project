@@ -169,7 +169,7 @@ def recommend_books_from_movie(movie_title):
 # FLOW 4: BOOK (Genre) -> MOVIE (The "Dropdown" Logic)
 # 1. User picks Genre -> 2. Find TMDb ID in SQL -> 3. Discover Movies
 # ===========================================================================
-def recommend_movies_from_genre_dropdown(selected_genre):
+def recommend_movies_from_book(selected_genre):
     print(f"\n--- 4. Book (Dropdown) to Movie: Genre '{selected_genre}' ---")
     conn = get_db_connection()
     if not conn: return
@@ -242,6 +242,7 @@ def get_movie_posters(movie_title):
         print("-" * 40)
 
 
+# =================================== GET BOOK COVER ========================================
 
 def get_book_cover_url(book_data):
     """
@@ -264,22 +265,40 @@ def get_book_cover_url(book_data):
     # 3. No cover found
     return "https://via.placeholder.com/128x192?text=No+Cover"
 
+
+# =================================== GET POPULAR MOVIES FOR EXPLORE PAGE ========================================
+
+def get_popular_movies():
+    movie = Movie()
+
+    popular = movie.popular()
+
+    for p in list(popular)[:4]:
+        print("Title:", p.title)
+        print("Poster Path:", p.poster_path)
+        print("Popularity Rating:", p.popularity)
+        print("Release Date:", p.release_date)
+
 # ===========================================================================
 # MAIN EXECUTION
 # ===========================================================================
 if __name__ == "__main__":
     # Test 1: Movie -> Movie
-    recommend_movies_from_movie("The Matrix")
+    # recommend_movies_from_movie("The Matrix")
 
-    # Test 2: Book -> Book
-    recommend_books_from_book("Dune")
+    # # Test 2: Book -> Book
+    # recommend_books_from_book("Dune")
 
-    # Test 3: Movie -> Book (Reverse Lookup), need to be connected to Azure SQL
-    recommend_books_from_movie("The Notebook") 
+    # # Test 3: Movie -> Book (Reverse Lookup), need to be connected to Azure SQL
+    # recommend_books_from_movie("The Notebook") 
 
-    # Test 4: Book -> Movie (Dropdown Input), need to be connected to Azure SQL
-    # This simulates the user selecting "fantasy" from your dropdown
-    recommend_movies_from_genre_dropdown("fantasy")
+    # # Test 4: Book -> Movie (Dropdown Input), need to be connected to Azure SQL
+    # # This simulates the user selecting "fantasy" from your dropdown
+    # recommend_movies_from_book("fantasy")
 
-    #Test Poster Function
-    get_movie_posters("Harry Potter and the Sorcerer's Stone")
+    # #Test Poster Function
+    # get_movie_posters("Harry Potter and the Sorcerer's Stone")
+
+
+    #For explore page at beginning
+    get_popular_movies()
