@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Details • Find Your Next…</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Find Your Next…</h1>
+    <p id="heroLine">More about your pick</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="top">
+        <img id="poster" class="poster" alt="Cover/Poster">
+        <div>
+          <h2 id="title" class="detail-title">Title</h2>
+          <div class="meta" id="meta">Type • Year • Rating</div>
+          <div class="chips" id="chips"></div>
+          <p class="desc" id="desc">Loading description…</p>
+          <div class="row">
+            <a class="back-btn" href="javascript:history.back()">← Back</a>
+            <a id="openExternal" class="btn" target="_blank" rel="noopener">Search on the web</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 Find Your Next…</footer>
+
+  <script>
+    const p = new URLSearchParams(location.search);
+    const data = {
+      id: p.get('id') || '',
+      kind: (p.get('kind') || 'movie').toLowerCase(),
+      title: p.get('title') || 'Unknown',
+      year: p.get('year') || '',
+      rating: p.get('rating') || '',
+      poster: p.get('poster') || 'https://via.placeholder.com/600x900.png?text=No+Image',
+      desc: p.get('desc') || 'No description available yet.'
+};
+
+
+    const pretty = x => x === 'book' ? 'Book' : 'Movie';
+
+    document.getElementById('heroLine').textContent =
+      `Detailed view • ${pretty(data.kind)}`;
+
+    document.getElementById('title').textContent = data.title;
+
+    document.getElementById('meta').textContent =
+      `${pretty(data.kind)}${data.year ? ' • ' + data.year : ''}${data.rating ? ' • Rating: ' + data.rating : ''}`;
+
+    const posterEl = document.getElementById('poster');
+    posterEl.src = data.poster;
+    posterEl.alt = `${pretty(data.kind)} cover for ${data.title}`;
+
+    document.getElementById('desc').textContent = data.desc;
+
+    // Genres as chips
+    const chipsEl = document.getElementById('chips');
+    data.genres.split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
+      .forEach(g => {
+        const span = document.createElement('span');
+        span.className = 'chip';
+        span.textContent = g;
+        chipsEl.appendChild(span);
+      });
+
+    // External link: basic Google search using title + kind
+    const open = document.getElementById('openExternal');
+    open.href = `https://www.google.com/search?q=${encodeURIComponent(data.title + ' ' + pretty(data.kind))}`;
+    open.textContent = 'Search this title';
+  </script>
+</body>
+</html>

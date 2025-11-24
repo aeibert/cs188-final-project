@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Find Your Next…</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Find Your Next…</h1>
+    <p>Book or Movie — Discover stories you'll love!</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2 class="search-head">What are you looking for?</h2>
+
+      <form class="search-form" action="results.html" method="get" novalidate>
+
+        <!-- I'm entering -->
+        <div class="field">
+          <label for="inputKind">I'm entering</label>
+          <select id="inputKind" name="inputKind">
+            <option value="movie">Movie</option>
+            <option value="book">Book</option>
+          </select>
+        </div>
+      
+        <!-- Recommend me -->
+        <div class="field">
+          <label for="targetKind">Recommend me</label>
+          <select id="targetKind" name="targetKind">
+            <option value="book">Books</option>
+            <option value="movie" selected>Movies</option>
+          </select>
+        </div>
+      
+        <!-- Title -->
+        <div class="field">
+          <label for="q">Title</label>
+          <input id="q" name="q" type="text" placeholder="Enter your favorite title…" required />
+        </div>
+      
+        <!-- How many -->
+        <div class="field">
+          <label for="limit">Show</label>
+          <select id="limit" name="limit">
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="9">9</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+      
+        <!-- GENRE DROPDOW` N (hidden unless Book -> Movies) -->
+        <div class="field" id="genreField" style="display:none;">
+          <label for="genre">Genre / Subject</label>
+          <select id="genre" name="genre">
+            <option value="">Select a Genre</option>
+            <option value="action">Action</option>
+            <option value="adventure">Adventure</option>
+            <option value="anthropology">Anthropology</option>
+            <option value="astronomy">Astronomy</option>
+            <option value="archaeology">Archaeology</option>
+            <option value="architecture">Architecture</option>
+            <option value="art">Art</option>
+            <option value="aviation">Aviation</option>
+            <option value="biography">Biography</option>
+            <option value="biology">Biology</option>
+            <option value="business">Business</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="children">Children</option>
+            <option value="classics">Classics</option>
+            <option value="contemporary">Contemporary</option>
+            <option value="cookbook">Cookbook</option>
+            <option value="crafts">Crafts</option>
+            <option value="crime">Crime</option>
+            <option value="dystopia">Dystopia</option>
+            <option value="economics">Economics</option>
+            <option value="education">Education</option>
+            <option value="engineering">Engineering</option>
+            <option value="environment">Environment</option>
+            <option value="erotica">Erotica</option>
+            <option value="essay">Essay</option>
+            <option value="fairy tales">Fairy Tales</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="fashion">Fashion</option>
+            <option value="feminism">Feminism</option>
+            <option value="fiction">Fiction</option>
+            <option value="finance">Finance</option>
+            <option value="folklore">Folklore</option>
+            <option value="food">Food</option>
+            <option value="gaming">Gaming</option>
+            <option value="gardening">Gardening</option>
+            <option value="geography">Geography</option>
+            <option value="geology">Geology</option>
+            <option value="graphic novel">Graphic Novel</option>
+            <option value="health">Health</option>
+            <option value="historical">Historical</option>
+            <option value="historical fiction">Historical Fiction</option>
+            <option value="history">History</option>
+            <option value="horror">Horror</option>
+            <option value="how to">How To</option>
+            <option value="humor">Humor</option>
+            <option value="inspirational">Inspirational</option>
+            <option value="journalism">Journalism</option>
+            <option value="law">Law</option>
+            <option value="literary fiction">Literary Fiction</option>
+            <option value="literature">Literature</option>
+            <option value="magical realism">Magical Realism</option>
+            <option value="manga">Manga</option>
+            <option value="martial arts">Martial Arts</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="medicine">Medicine</option>
+            <option value="medieval">Medieval</option>
+            <option value="memoir">Memoir</option>
+            <option value="mystery">Mystery</option>
+            <option value="mythology">Mythology</option>
+            <option value="nature">Nature</option>
+            <option value="nonfiction">Nonfiction</option>
+            <option value="novel">Novel</option>
+            <option value="occult">Occult</option>
+            <option value="paranormal">Paranormal</option>
+            <option value="parenting">Parenting</option>
+            <option value="philosophy">Philosophy</option>
+            <option value="physics">Physics</option>
+            <option value="picture book">Picture Book</option>
+            <option value="poetry">Poetry</option>
+            <option value="politics">Politics</option>
+            <option value="programming">Programming</option>
+            <option value="psychology">Psychology</option>
+            <option value="reference">Reference</option>
+            <option value="relationships">Relationships</option>
+            <option value="religion">Religion</option>
+            <option value="romance">Romance</option>
+            <option value="science and technology">Science and Technology</option>
+            <option value="science fiction">Science Fiction</option>
+            <option value="self help">Self Help</option>
+            <option value="short stories">Short Stories</option>
+            <option value="society">Society</option>
+            <option value="sociology">Sociology</option>
+            <option value="space">Space</option>
+            <option value="spirituality">Spirituality</option>
+            <option value="sports">Sports</option>
+            <option value="text book">Text Book</option>
+            <option value="thriller">Thriller</option>
+            <option value="travel">Travel</option>
+            <option value="true crime">True Crime</option>
+            <option value="war">War</option>
+            <option value="writing">Writing</option>
+            <option value="young adult">Young Adult</option>
+          </select>
+        </div>
+      
+        <!-- Submit -->
+        <button class="btn" type="submit">Search</button>
+      </form>
+      
+
+      <p class="micro">
+        Tip: Try entering <em>Interstellar</em>, <em>Dune:Part Two</em>, <em>La La Land</em>, or <em>Spider-Man: No Way Home</em> to see how the site behaves.
+      </p>
+    </section>
+  </main>
+
+  <!-- Featured movies -->
+  <section class="featured">
+    <div class="card">
+      <h2>Featured Movies</h2>
+      <div id="featured-grid" class="featured-grid"></div>
+    </div>
+  </section>
+
+  <footer>© 2025 Find Your Next…</footer>
+
+ <script>
+  // ---------- SAMPLE DATA ----------
+  const SAMPLE_MOVIES = [
+    {
+      id: 'spiderman-nwh',
+      title: 'Spider-Man: No Way Home',
+      year: 2021,
+      rating: 8.3,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
+      description: 'Peter Parker’s life is turned upside down when a spell gone wrong opens the multiverse, unleashing villains from alternate realities.',
+      genres: ['Action', 'Superhero']
+    },
+    {
+    id: 'dark-knight',
+    title: 'The Dark Knight',
+    year: 2008,
+    rating: 9.0,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
+    description: 'Batman faces the Joker, a criminal mastermind who unleashes chaos on Gotham City, pushing the hero to his limits.',
+    genres: ['Action', 'Crime']
+    },
+    {
+      id: 'avatar-2',
+      title: 'Avatar: The Way of Water',
+      year: 2022,
+      rating: 7.7,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg',
+      description: 'Jake Sully and Neytiri must protect their family when a new threat forces them into the oceans of Pandora.',
+      genres: ['Sci-Fi', 'Adventure']
+    },
+      {
+    id: 'barbie-23',
+    title: 'Barbie',
+    year: 2023,
+    rating: 7.2,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg',
+    description: 'Barbie and Ken enter the real world and confront what it truly means to be human.',
+    genres: ['Comedy', 'Fantasy']
+  },
+  {
+    id: 'top-gun-mav',
+    title: 'Top Gun: Maverick',
+    year: 2022,
+    rating: 8.3,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg',
+    description: 'After decades of service, Maverick returns to Top Gun to train elite recruits while facing ghosts of his past.',
+    genres: ['Action', 'Drama']
+  },
+  {
+    id: 'wonka-23',
+    title: 'Wonka',
+    year: 2023,
+    rating: 7.2,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/qhb1qOilapbapxWQn9jtRCMwXJF.jpg',
+    description: 'A young Willy Wonka chases his dream of opening a chocolate shop in this magical musical adventure.',
+    genres: ['Family', 'Fantasy']
+  },
+    {
+    id: 'elemental-23',
+    title: 'Elemental',
+    year: 2023,
+    rating: 7.5,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/8riWcADI1ekEiBguVB9vkilhiQm.jpg',
+    description: 'In a city of fire, water, earth, and air, a fiery girl and a watery boy discover unexpected connection.',
+    genres: ['Animation', 'Romance']
+  },
+  {
+    id: 'wakanda-forever',
+    title: 'Black Panther: Wakanda Forever',
+    year: 2022,
+    rating: 7.1,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/ps2oKfhY6DL3alynlSqY97gHSsg.jpg',
+    description: 'The people of Wakanda fight to protect their nation in the wake of King T’Challa’s death.',
+    genres: ['Action', 'Adventure']
+  },
+    {
+    id: 'gotg-3',
+    title: 'Guardians of the Galaxy Vol. 3',
+    year: 2023,
+    rating: 8.0,
+    kind: 'movie',
+    poster: 'https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg',
+    description: 'The Guardians rally to save Rocket and confront painful memories from his past.',
+    genres: ['Action', 'Sci-Fi']
+  }
+
+
+  ];
+
+  const inputKind = document.getElementById('inputKind');
+  const targetKind = document.getElementById('targetKind');
+  const q = document.getElementById('q');
+  const genreField = document.getElementById('genreField');
+  const genreSelect = document.getElementById('genre');
+
+
+  function refreshUI() {
+  const entering = inputKind.value;
+  const recommending = targetKind.value;
+
+  const isBookToMovie = entering === 'book' && recommending === 'movie';
+
+  // Placeholder
+  q.placeholder = entering === 'book' ? 'e.g., The Hobbit' : 'e.g., Interstellar';
+
+  // Show genre only for Book -> Movie
+  if (isBookToMovie) {
+    genreField.style.display = 'block';
+  } else {
+    genreField.style.display = 'none';
+    genreSelect.value = '';
+  }
+}
+  inputKind.addEventListener('change', refreshUI);
+  targetKind.addEventListener('change', refreshUI);
+
+  refreshUI();
+
+
+  const pretty = x => x === 'book' ? 'Book' : 'Movie';
+
+  // ---------- FEATURED MOVIES RENDERING ----------
+  function setFeaturedMovies(movies = [], opts = {}) {
+    const grid = document.getElementById('featured-grid');
+    if (!grid) return;   // if HTML not found, bail
+
+    const count = opts.count ?? 4;
+    grid.innerHTML = '';
+
+    const pool = [...movies]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, count);
+
+    for (const m of pool) {
+      const card = document.createElement('a');
+      card.className = 'movie-card';
+
+      const qp = new URLSearchParams({
+        id: m.id,
+        kind: m.kind,
+        title: m.title,
+        year: String(m.year || ''),
+        rating: String(m.rating ?? ''),
+        poster: m.poster,
+        desc: m.description,
+        genres: (m.genres || []).join(', ')
+      });
+
+      card.href = `detail.html?${qp.toString()}`;
+
+      card.innerHTML = `
+        <img src="${m.poster}" alt="Movie cover for ${m.title}">
+        <h3>${m.title}</h3>
+        <p>
+          Movie • ${m.year}<br>
+          Rating: ${m.rating}
+        </p>
+      `;
+
+      grid.appendChild(card);
+    }
+  }
+
+  // Wait until DOM is ready so #featured-grid exists
+  document.addEventListener('DOMContentLoaded', () => {
+    refreshUI();                    // set correct placeholder + dropdown logic
+    setFeaturedMovies(SAMPLE_MOVIES, { count: 4 });  // draw the cards
+  });
+</script>

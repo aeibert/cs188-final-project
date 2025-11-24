@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Results • Find Your Next…</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>Find Your Next…</h1>
+    <p id="heroLine">Results based off your search</p>
+  </header>
+
+  <main class="wrap">
+    <section class="card" aria-live="polite">
+      <div class="summary">
+        <div class="summary-main">
+          <h2>Recommendations</h2>
+          <div id="summaryText" class="meta">Preparing your results…</div>
+          <div id="pills" class="pills-row"></div>
+        </div>
+
+        <div class="summary-toolbar">
+          <a class="back-link" href="index.html">← Back to search</a>
+
+          <div class="controls">
+            <div class="control-group">
+              <span class="control-label">Sort</span>
+              <select id="sort" aria-label="Sort results">
+                <option value="relevance">Relevance</option>
+                <option value="rating-desc">Rating ↓</option>
+                <option value="year-desc">Year ↓</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Show</span>
+              <select id="limit" aria-label="Number of results to show">
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="9">9</option>
+                <option value="12">12</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="results" class="grid"></div>
+      <div id="empty" class="empty" style="display:none">
+        No results yet. Try another search.
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2025 Find Your Next…</footer>
+
+  <script>
+  // ---------- SAMPLE DATA (same as index.html) ----------
+  const SAMPLE_MOVIES = [
+    {
+      id: 'spiderman-nwh',
+      title: 'Spider-Man: No Way Home',
+      year: 2021,
+      rating: 8.3,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
+      description: 'Peter Parker’s life is turned upside down when a spell gone wrong opens the multiverse, unleashing villains from alternate realities.',
+      genres: ['Action', 'Superhero']
+    },
+    {
+      id: 'dark-knight',
+      title: 'The Dark Knight',
+      year: 2008,
+      rating: 9.0,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
+      description: 'Batman faces the Joker, a criminal mastermind who unleashes chaos on Gotham City, pushing the hero to his limits.',
+      genres: ['Action', 'Crime']
+    },
+    {
+      id: 'avatar-2',
+      title: 'Avatar: The Way of Water',
+      year: 2022,
+      rating: 7.7,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg',
+      description: 'Jake Sully and Neytiri must protect their family when a new threat forces them into the oceans of Pandora.',
+      genres: ['Sci-Fi', 'Adventure']
+    },
+    {
+      id: 'barbie-23',
+      title: 'Barbie',
+      year: 2023,
+      rating: 7.2,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg',
+      description: 'Barbie and Ken enter the real world and confront what it truly means to be human.',
+      genres: ['Comedy', 'Fantasy']
+    },
+    {
+      id: 'top-gun-mav',
+      title: 'Top Gun: Maverick',
+      year: 2022,
+      rating: 8.3,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg',
+      description: 'After decades of service, Maverick returns to Top Gun to train elite recruits while facing ghosts of his past.',
+      genres: ['Action', 'Drama']
+    },
+    {
+      id: 'wonka-23',
+      title: 'Wonka',
+      year: 2023,
+      rating: 7.2,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/qhb1qOilapbapxWQn9jtRCMwXJF.jpg',
+      description: 'A young Willy Wonka chases his dream of opening a chocolate shop in this magical musical adventure.',
+      genres: ['Family', 'Fantasy']
+    },
+    {
+      id: 'elemental-23',
+      title: 'Elemental',
+      year: 2023,
+      rating: 7.5,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/8riWcADI1ekEiBguVB9vkilhiQm.jpg',
+      description: 'In a city of fire, water, earth, and air, a fiery girl and a watery boy discover unexpected connection.',
+      genres: ['Animation', 'Romance']
+    },
+    {
+      id: 'wakanda-forever',
+      title: 'Black Panther: Wakanda Forever',
+      year: 2022,
+      rating: 7.1,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/ps2oKfhY6DL3alynlSqY97gHSsg.jpg',
+      description: 'The people of Wakanda fight to protect their nation in the wake of King T’Challa’s death.',
+      genres: ['Action', 'Adventure']
+    },
+    {
+      id: 'gotg-3',
+      title: 'Guardians of the Galaxy Vol. 3',
+      year: 2023,
+      rating: 8.0,
+      kind: 'movie',
+      poster: 'https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg',
+      description: 'The Guardians rally to save Rocket and confront painful memories from his past.',
+      genres: ['Action', 'Sci-Fi']
+    }
+  ];
+
+  // ---------- READ QUERY + ELEMENTS ----------
+  const params = new URLSearchParams(location.search);
+  const qRaw = params.get('q') || '';
+  const q = qRaw.trim().toLowerCase();
+
+  // NEW: genre from URL (for Book -> Movie + Genre)
+  const genreRaw = params.get('genre') || '';
+  const genre = genreRaw.trim();
+  const genreLower = genre.toLowerCase();
+
+  const inputKind = (params.get('inputKind') || 'movie').toLowerCase();
+  const targetKind = (params.get('targetKind') || 'movie').toLowerCase();
+  const initialLimit = Math.max(1, parseInt(params.get('limit') || '6', 10));
+
+  const heroLine = document.getElementById('heroLine');
+  const summaryText = document.getElementById('summaryText');
+  const pillsEl = document.getElementById('pills');
+  const resultsEl = document.getElementById('results');
+  const emptyEl = document.getElementById('empty');
+  const sortSel = document.getElementById('sort');
+  const limitSel = document.getElementById('limit');
+
+  const pretty = x => (x === 'book' ? 'Book' : 'Movie');
+
+  // ---------- HEADER TEXT ----------
+  heroLine.textContent = q
+    ? `You entered a ${pretty(inputKind)}: “${qRaw}”. We’re recommending ${pretty(targetKind)}s.`
+    : 'Results based off your search';
+
+  summaryText.textContent = q
+    ? `Showing ${genre ? genre + ' ' : ''}${pretty(targetKind)} recommendations similar to “${qRaw}”.`
+    : `Showing sample ${genre ? genre + ' ' : ''}${pretty(targetKind)} recommendations.`;
+
+  // Pills
+  function addPill(text){
+    const span = document.createElement('span');
+    span.className = 'pill';
+    span.textContent = text;
+    pillsEl.appendChild(span);
+  }
+  if (qRaw) addPill(`Query: ${qRaw}`);
+  if (genre) addPill(`Genre: ${genre}`);
+  addPill(`${pretty(inputKind)} → ${pretty(targetKind)}`);
+
+  // ---------- SIMPLE "SIMILARITY" SCORE ----------
+  function scoreMovie(movie) {
+    if (!q) return 1;          // no query: everyone gets basic score
+    const title = (movie.title || '').toLowerCase();
+    if (!title) return 0;
+
+    let score = 0;
+    if (title === q) score += 5;          // exact match
+    if (title.includes(q)) score += 3;    // full query substring
+
+    const words = q.split(/\s+/);
+    for (const w of words) {
+      if (w && title.includes(w)) score += 1; // matching words
+    }
+    return score;
+  }
+
+  // ---------- BASE ITEMS (GENRE + TITLE FILTERING) ----------
+  function getBaseItems() {
+    let items = SAMPLE_MOVIES.map(m => ({
+      ...m,
+      _score: scoreMovie(m)
+    }));
+
+    // 1) Filter by genre first (if selected)
+    if (genreLower) {
+      const byGenre = items.filter(m =>
+        (m.genres || []).some(g => g.toLowerCase() === genreLower)
+      );
+      if (byGenre.length) {
+        items = byGenre;
+      }
+      // if no movie matches that genre, we silently fall back to all items
+    }
+
+    // 2) Then filter by similarity if user typed something
+    if (q) {
+      const maxScore = Math.max(...items.map(i => i._score));
+      if (maxScore > 0) {
+        items = items.filter(i => i._score > 0);
+      }
+    }
+    return items;
+  }
+
+  // ---------- SORTING + RENDER ----------
+  function sortBy(list, how){
+    switch (how) {
+      case 'rating-desc':
+        return [...list].sort((a,b) => (b.rating ?? -1) - (a.rating ?? -1));
+      case 'year-desc':
+        return [...list].sort((a,b) => (b.year ?? -1) - (a.year ?? -1));
+      default: // relevance
+        return [...list].sort(
+          (a,b) =>
+            (b._score ?? 0) - (a._score ?? 0) ||
+            (b.rating ?? 0) - (a.rating ?? 0)
+        );
+    }
+  }
+
+  function render(list, limit){
+    resultsEl.innerHTML = '';
+    const slice = list.slice(0, limit);
+    if (!slice.length){
+      emptyEl.style.display = 'block';
+      return;
+    }
+    emptyEl.style.display = 'none';
+
+    for (const it of slice) {
+      const a = document.createElement('a');
+      a.className = 'item';
+
+      const qp = new URLSearchParams({
+        id: it.id,
+        kind: it.kind,
+        title: it.title,
+        year: String(it.year || ''),
+        rating: String(it.rating ?? ''),
+        poster: it.poster,
+        desc: it.description,
+        genres: (it.genres || []).join(', ')
+      });
+      a.href = `detail.html?${qp.toString()}`;
+
+      const img = document.createElement('img');
+      img.className = 'thumb';
+      img.alt = `${pretty(it.kind)} cover for ${it.title}`;
+      img.src = it.poster;
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = 'https://via.placeholder.com/400x600.png?text=No+Image';
+      };
+
+      const pad = document.createElement('div');
+      pad.className = 'pad';
+
+      const t = document.createElement('div');
+      t.className = 'title';
+      t.textContent = it.title;
+
+      const m = document.createElement('div');
+      m.className = 'meta-small';
+      m.textContent = `${pretty(it.kind)} • ${it.year || ''}`;
+
+      const r = document.createElement('div');
+      r.className = 'meta-small';
+      r.textContent = (it.rating != null) ? `Rating: ${it.rating}` : '';
+
+      pad.append(t, m, r);
+      a.append(img, pad);
+      resultsEl.append(a);
+    }
+  }
+
+  // ---------- WIRE CONTROLS ----------
+  sortSel.addEventListener('change', () => {
+    render(sortBy(getBaseItems(), sortSel.value), parseInt(limitSel.value,10));
+  });
+
+  limitSel.addEventListener('change', () => {
+    const p = new URLSearchParams(location.search);
+    p.set('limit', limitSel.value);
+    history.replaceState(null, '', `${location.pathname}?${p.toString()}`);
+    render(sortBy(getBaseItems(), sortSel.value), parseInt(limitSel.value,10));
+  });
+
+  // ---------- INITIAL RENDER ----------
+  limitSel.value = String(initialLimit);
+  render(sortBy(getBaseItems(), sortSel.value), initialLimit);
+  </script>
+
+</body>
+</html>
