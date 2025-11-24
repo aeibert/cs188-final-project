@@ -10,6 +10,7 @@ dependencies = [
     "flask-restful>=0.3.10",
     "omdb>=0.10.1",
     "pyodbc>=5.3.0",
+    "python-dotenv>=1.2.1",
     "tmdbv3api>=1.9.0",
 ]
 
