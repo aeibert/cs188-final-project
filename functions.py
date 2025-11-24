@@ -40,26 +40,25 @@ def get_db_connection():
 # FLOW 1: MOVIE -> MOVIE (Using TMDb Built-in)
 # ===========================================================================
 def recommend_movies_from_movie(movie_title,number):
-    print(f"\n--- 1. Movie to Movie: '{movie_title}' ---")
+    results = []
     try:
-        # 1. Find the movie ID
         search_results = search_api.movies(movie_title)
-        if not search_results:
-            print(f"Movie '{movie_title}' not found.")
-            return
+        if not search_results: return []
 
         first_movie = search_results[0]
-        print(f"Found Source Movie: {first_movie.title} (ID: {first_movie.id})")
-
-        # 2. Get recommendations
-        recommendations = movie_api.recommendations(first_movie.id)
+        recs = movie_api.recommendations(first_movie.id)
         
-        print("Recommendations:")
-        for i, m in enumerate(list(recommendations)[:number]):
-            print(f"  {i+1}. {m.title}")
-
+        target_list = list(recs)[:int(number)]
+        for m in target_list: # removed slicing here to handle it in app.py
+            results.append({
+                "title": m.title,
+                "year": m.release_date[:4] if hasattr(m, 'release_date') and m.release_date else "N/A",
+                "image": f"https://image.tmdb.org/t/p/w500{m.poster_path}" if m.poster_path else "https://via.placeholder.com/500x750?text=No+Image",
+                "kind": "Movie"
+            })
     except Exception as e:
-        print(f"Error in Movie->Movie: {e}")
+        print(f"Error: {e}")
+    return results
 
 # ===========================================================================
 # FLOW 2: BOOK -> BOOK (Using Big Book API Built-in)
@@ -277,7 +276,7 @@ def get_popular_movies():
 # ===========================================================================
 if __name__ == "__main__":
     # Test 1: Movie -> Movie
-    #recommend_movies_from_movie("The Matrix",2)
+    recommend_movies_from_movie("The Matrix",2)
 
     # # Test 2: Book -> Book
     #recommend_books_from_book("Dune",3)
@@ -294,4 +293,4 @@ if __name__ == "__main__":
 
 
     #For explore page at beginning
-    get_popular_movies()
+    #get_popular_movies()
