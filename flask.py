@@ -1,7 +1,13 @@
 from flask import Flask, render_template, request, jsonify
-import testing   # <-- logic file
+import pyodbc
+import testing  # <-- logic file
+from testing import AZURE_CONN_STRING
 
 app = Flask(__name__)
+
+def get_db_connection():
+    connection = pyodbc.connect(AZURE_CONN_STRING)
+    return connection
 
 @app.route("/")
 def index():
