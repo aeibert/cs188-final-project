@@ -170,38 +170,31 @@ def recommend_books_from_movie(movie_title, number):
 # 1. User picks Genre -> 2. Find TMDb ID in SQL -> 3. Discover Movies
 # ===========================================================================
 def recommend_movies_from_book(selected_genre, number):
-    print(f"\n--- 4. Book (Dropdown) to Movie: Genre '{selected_genre}' ---")
     conn = get_db_connection()
-    if not conn: return
-
+    if not conn:
+        return {"error": "Database connection error."}
     try:
-        # 1. Look up the TMDb ID for the selected genre
-        # We normalize to lowercase just in case
         genre_clean = selected_genre.lower().strip()
-        
         cursor = conn.cursor()
         cursor.execute("SELECT TMDbGenreID FROM GenreMap WHERE BookGenreName = ?", (genre_clean,))
         row = cursor.fetchone()
-        
         if not row:
-            print(f"Genre '{selected_genre}' not found in database.")
-            return
-            
+            return {"error": f"Genre '{selected_genre}' not found in database."}
         tmdb_id = row[0]
-        print(f"Found TMDb ID: {tmdb_id}")
-
-        # 2. Discover Movies
         recs = discover_api.discover_movies({
             'with_genres': tmdb_id,
             'sort_by': 'popularity.desc'
         })
-        
-        print("Movie Recommendations:")
-        for i, m in enumerate(list(recs)[:number]):
-            print(f"  {i+1}. {m.title}")
-
+        results = []
+        for m in list(recs)[:number]:
+            results.append({
+                "title": m.title,
+                "id": m.id,
+                "poster_path": getattr(m, 'poster_path', None)
+            })
+        return {"recommendations": results}
     except Exception as e:
-        print(f"Error in Book->Movie: {e}")
+        return {"error": f"Error in Book->Movie: {e}"}
     finally:
         conn.close()
 
