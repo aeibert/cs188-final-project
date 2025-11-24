@@ -4,7 +4,10 @@ from tmdbv3api import TMDb, Movie, Discover, Search
 import bigbookapi
 #from bigbookapi.rest import ApiException
 from dotenv import load_dotenv
-load_dotenv(".secret.env")  # <--- This loads the variables from .env
+
+if "WEBSITE_HOSTNAME" not in os.environ:
+    # Development
+    load_dotenv(".secret.env")
 
 # --- CONFIGURATION ---------------------------------------------------------
 # Azure SQL Connection String

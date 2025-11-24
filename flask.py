@@ -1,23 +1,36 @@
-from flask import Flask, request, jsonify
-import requests
-import pyodbc
-import os
-from dotenv import load_dotenv
-
-if "WEBSITE_HOSTNAME" not in os.environ:
-    # Development
-    load_dotenv(".secret.env")
-
-
-# We now load the connection string from the environment variable.
-CONNECTION_STRING = os.environ["AZURE_SQL_CONNECTIONSTRING"]
-
-# === API Keys ===
-TMDB_API_KEY = os.environ["TMDB_API_KEY"]
-BIGBOOK_API_KEY = os.environ["BIGBOOK_API_KEY"]
+from flask import Flask, render_template, request, jsonify
+import testing   # <-- logic file
 
 app = Flask(__name__)
 
-def get_db_connection():
-    connection = pyodbc.connect(CONNECTION_STRING)
-    return connection
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/recommend", methods=["GET"])
+def recommend():
+    input_kind = request.args.get("inputKind")
+    target_kind = request.args.get("targetKind")
+    title = request.args.get("q")
+
+    # Decide which function to call
+    if input_kind == "movie" and target_kind == "movie":
+        data = testing.recommend_movies_from_movie(title)
+
+    elif input_kind == "book" and target_kind == "book":
+        data = testing.recommend_books_from_book(title)
+
+    elif input_kind == "movie" and target_kind == "book":
+        data = testing.recommend_books_from_movie(title)
+
+    elif input_kind == "book" and target_kind == "movie":
+        data = testing.recommend_movies_from_genre_dropdown(title)
+
+    else:
+        data = {"error": "Unsupported request"}
+
+    return jsonify(data)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
