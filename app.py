@@ -13,29 +13,40 @@ def get_db_connection():
 def index():
     return render_template("index.html")
 
-@app.route("/recommend", methods=["GET"])
+@app.route("/recommend")
 def recommend():
-    input_kind = request.args.get("inputKind")
-    target_kind = request.args.get("targetKind")
-    title = request.args.get("q")
+    # 1. Get data from the form
+    input_kind = request.args.get("inputKind")   # "book" or "movie"
+    target_kind = request.args.get("targetKind") # "book" or "movie"
+    title = request.args.get("q")                # e.g., "Dune"
+    genre = request.args.get("genre")            # e.g., "fantasy"
+    limit = int(request.args.get("limit", 4))    # Default to 4 if missing
 
-    # Decide which function to call
+    results = []
+
+    # 2. Call the correct function based on inputs
     if input_kind == "movie" and target_kind == "movie":
-        data = functions.recommend_movies_from_movie(title)
+        results = functions.recommend_movies_from_movie(title)
 
     elif input_kind == "book" and target_kind == "book":
-        data = functions.recommend_books_from_book(title)
+        results = functions.recommend_books_from_book(title)
 
     elif input_kind == "movie" and target_kind == "book":
-        data = functions.recommend_books_from_movie(title)
+        results = functions.recommend_books_from_movie(title)
 
     elif input_kind == "book" and target_kind == "movie":
-        data = functions.recommend_movies_from_genre_dropdown(title)
+        # In this mode, we use the genre dropdown, NOT the title input
+        if genre:
+            results = functions.recommend_movies_from_genre_dropdown(genre)
+        else:
+            # Fallback if they didn't pick a genre
+            results = []
 
-    else:
-        data = {"error": "Unsupported request"}
+    # 3. Apply the limit (slice the list)
+    final_results = results[:limit]
 
-    return jsonify(data)
+    # 4. Render the results page with the data
+    return render_template("results.html", recommendations=final_results)
 
 if __name__ == "__main__":
     app.run(debug=True)
