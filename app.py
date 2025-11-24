@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import pyodbc
-import testing  # <-- logic file
-from testing import AZURE_CONN_STRING
+import functions  # <-- logic file
+from functions import AZURE_CONN_STRING
 
 app = Flask(__name__)
 
@@ -21,16 +21,16 @@ def recommend():
 
     # Decide which function to call
     if input_kind == "movie" and target_kind == "movie":
-        data = testing.recommend_movies_from_movie(title)
+        data = functions.recommend_movies_from_movie(title)
 
     elif input_kind == "book" and target_kind == "book":
-        data = testing.recommend_books_from_book(title)
+        data = functions.recommend_books_from_book(title)
 
     elif input_kind == "movie" and target_kind == "book":
-        data = testing.recommend_books_from_movie(title)
+        data = functions.recommend_books_from_movie(title)
 
     elif input_kind == "book" and target_kind == "movie":
-        data = testing.recommend_movies_from_genre_dropdown(title)
+        data = functions.recommend_movies_from_genre_dropdown(title)
 
     else:
         data = {"error": "Unsupported request"}
