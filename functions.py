@@ -39,7 +39,7 @@ def get_db_connection():
 # ===========================================================================
 # FLOW 1: MOVIE -> MOVIE (Using TMDb Built-in)
 # ===========================================================================
-def recommend_movies_from_movie(movie_title):
+def recommend_movies_from_movie(movie_title,number):
     print(f"\n--- 1. Movie to Movie: '{movie_title}' ---")
     try:
         # 1. Find the movie ID
@@ -55,7 +55,7 @@ def recommend_movies_from_movie(movie_title):
         recommendations = movie_api.recommendations(first_movie.id)
         
         print("Recommendations:")
-        for i, m in enumerate(list(recommendations)[:5]):
+        for i, m in enumerate(list(recommendations)[:number]):
             print(f"  {i+1}. {m.title}")
 
     except Exception as e:
@@ -64,7 +64,7 @@ def recommend_movies_from_movie(movie_title):
 # ===========================================================================
 # FLOW 2: BOOK -> BOOK (Using Big Book API Built-in)
 # ===========================================================================
-def recommend_books_from_book(book_title):
+def recommend_books_from_book(book_title, number):
     print(f"\n--- 2. Book to Book: '{book_title}' ---")
     try:
         with bigbookapi.ApiClient(book_config) as api_client:
@@ -80,7 +80,7 @@ def recommend_books_from_book(book_title):
             print(f"Found Source Book ID: {book_id}")
 
             # 2. Get similar books
-            similar_res = api_instance.find_similar_books(book_id, number=5)
+            similar_res = api_instance.find_similar_books(book_id, number)
             
             print("Recommendations:")
             if similar_res.get('similar_books'):
@@ -96,7 +96,7 @@ def recommend_books_from_book(book_title):
 # FLOW 3: MOVIE -> BOOK (The "Reverse" Logic)
 # 1. Get Movie Genre -> 2. Find matching Book Genre in SQL -> 3. Search Books
 # ===========================================================================
-def recommend_books_from_movie(movie_title):
+def recommend_books_from_movie(movie_title, number):
     print(f"\n--- 3. Movie to Book: '{movie_title}' ---")
     conn = get_db_connection()
     if not conn: return
@@ -139,7 +139,7 @@ def recommend_books_from_movie(movie_title):
             book_recs = api_instance.search_books(
                 genres=book_genre_name, 
                 sort='rating', 
-                number=5
+                number=number
             )
             
             print("Book Recommendations:")
@@ -169,7 +169,7 @@ def recommend_books_from_movie(movie_title):
 # FLOW 4: BOOK (Genre) -> MOVIE (The "Dropdown" Logic)
 # 1. User picks Genre -> 2. Find TMDb ID in SQL -> 3. Discover Movies
 # ===========================================================================
-def recommend_movies_from_book(selected_genre):
+def recommend_movies_from_book(selected_genre, number):
     print(f"\n--- 4. Book (Dropdown) to Movie: Genre '{selected_genre}' ---")
     conn = get_db_connection()
     if not conn: return
@@ -197,7 +197,7 @@ def recommend_movies_from_book(selected_genre):
         })
         
         print("Movie Recommendations:")
-        for i, m in enumerate(list(recs)[:5]):
+        for i, m in enumerate(list(recs)[:number]):
             print(f"  {i+1}. {m.title}")
 
     except Exception as e:
@@ -284,17 +284,17 @@ def get_popular_movies():
 # ===========================================================================
 if __name__ == "__main__":
     # Test 1: Movie -> Movie
-    # recommend_movies_from_movie("The Matrix")
+    #recommend_movies_from_movie("The Matrix",2)
 
     # # Test 2: Book -> Book
-    # recommend_books_from_book("Dune")
+    #recommend_books_from_book("Dune",3)
 
     # # Test 3: Movie -> Book (Reverse Lookup), need to be connected to Azure SQL
-    # recommend_books_from_movie("The Notebook") 
+    #recommend_books_from_movie("The Notebook", 4) 
 
     # # Test 4: Book -> Movie (Dropdown Input), need to be connected to Azure SQL
     # # This simulates the user selecting "fantasy" from your dropdown
-    # recommend_movies_from_book("fantasy")
+    #recommend_movies_from_book("fantasy",2)
 
     # #Test Poster Function
     # get_movie_posters("Harry Potter and the Sorcerer's Stone")
