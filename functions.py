@@ -105,15 +105,15 @@ def recommend_books_from_book(book_title, number):
 def recommend_books_from_movie(movie_title, number):
     results = []
     conn = get_db_connection()
-    if not conn: 
-        return []
+    if not conn: return []
+
     try:
         search_results = search_api.movies(movie_title)
-        if not search_results: 
-            return []
+        if not search_results: return []
+        
         movie_details = movie_api.details(search_results[0].id)
-        if not movie_details.genres: 
-            return []
+        if not movie_details.genres: return []
+            
         tmdb_id = movie_details.genres[0]['id']
         
         cursor = conn.cursor()
@@ -124,16 +124,33 @@ def recommend_books_from_movie(movie_title, number):
             book_genre_name = row[0]
             with bigbookapi.ApiClient(book_config) as api_client:
                 api_instance = bigbookapi.DefaultApi(api_client)
-                book_recs = api_instance.search_books(genres=book_genre_name, sort='rating', number=int(number))
+                
+                # 1. Find books by genre
+                book_recs = api_instance.search_books(
+                    genres=book_genre_name, 
+                    sort='rating', 
+                    number=int(number)
+                )
                 
                 if book_recs.get('books'):
                     for group in book_recs['books']:
                         if group:
                             b = group[0]
+                            
+                            # --- FIX: FETCH FULL DETAILS TO GET YEAR ---
+                            try:
+                                safe_id = int(float(b.get('id')))
+                                details = api_instance.get_book_information(safe_id)
+                                meta_text = format_meta_info(details)
+                            except Exception as e:
+                                # Fallback if the extra call fails
+                                meta_text = "N/A"
+                            # -------------------------------------------
+
                             results.append({
                                 "id": b.get('id'),
                                 "title": b.get('title'),
-                                "year": format_meta_info(b),
+                                "year": meta_text,
                                 "image": b.get('image') or "/static/images/image-not-available.jpg",
                                 "kind": "Book"
                             })
