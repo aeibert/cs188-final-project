@@ -56,6 +56,22 @@ def recommend():
         limit=limit
     )
 
+@app.route("/detail")
+def detail():
+    item_id = request.args.get("id")
+    kind = request.args.get("kind") # "movie" or "book"
+    
+    data = None
+    if kind and kind.lower() == "movie":
+        data = functions.get_movie_details(item_id)
+    elif kind and kind.lower() == "book":
+        data = functions.get_book_details(item_id)
+        
+    if not data:
+        return "Item not found", 404
+
+    return render_template("detail.html", data=data)
+
 if __name__ == "__main__":
     app.run(debug=True)
 

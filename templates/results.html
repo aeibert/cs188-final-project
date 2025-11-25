@@ -70,7 +70,7 @@
       <div id="results" class="grid">
         {% if recommendations %}
           {% for item in recommendations %}
-            <a class="item" href="#">
+            <a class="item" href="{{ url_for('detail', id=item.id, kind=item.kind) }}">
               <img class="thumb" src="{{ item.image }}" alt="{{ item.title }}" onerror="this.src='https://via.placeholder.com/400x600.png?text=No+Image'">
               <div class="pad">
                 <div class="title">{{ item.title }}</div>

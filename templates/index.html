@@ -174,7 +174,7 @@
       <div class="featured-grid">
         {% if featured_movies %}
           {% for m in featured_movies %}
-            <a class="movie-card" href="#">
+            <a class="movie-card" href="{{ url_for('detail', id=m.id, kind='movie') }}">
               <img src="{{ m.poster }}" alt="{{ m.title }}" onerror="this.src='/static/images/image-not-available.jpg'">
               <h3>{{ m.title }}</h3>
               <p>
