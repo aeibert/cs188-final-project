@@ -3,7 +3,7 @@
 A simple recommendation app that helps users decide **what to watch or read next** using books, movies, and genre-based matching.
 
 # **Contributors**
-* Amelia E., Maia B. Kendal S., Najmo M.
+* Amelia E., Maia B. Kendall S., Najmo M.
 
 ##  What It Does
 
@@ -33,6 +33,7 @@ People often struggle to pick their next movie or book. **Find Your Next…** so
 * Clean UI with buttons + color themes
 * Posters and book covers
 * Sort by rating
+* Customizable number of results
 
 
 ---
@@ -41,21 +42,22 @@ People often struggle to pick their next movie or book. **Find Your Next…** so
 
 ### **Frontend**
 
-* HTML templates: `index.html`, `results.html`, `detail.html`
-* Dynamic results UI (posters, plots, cards)
+* jinja HTML templates: `index.html`, `results.html`, `detail.html`
+* Dynamic results UI (posters, plots, cards) using css.
 * Responsive layout 
 
 ### **Backend (Flask)**
 
-* Calls Big Book API + TMDB API
-* Maps book genres → movie genres using `GenreMap`
-* Returns recommendations as JSON
+Calls Big Book API + TMDB API + OpenLibrary Covers API
+* For within same medium: both Big Book and TMDB API's have built in 'recommender' functions.
+* For cross-medium: maps book genres → movie genres for recommendation functions using `GenreMap`, SQL table in Azure
+* Returns: recommendations as JSON
 
 ---
 
 ##  External APIs
 
-* **Big Book API** (books + genres)
-* **TMDB API** (movies, posters, genres)
-* **OpenLibrary Covers API** (book covers)
+* **Big Book API** (search for books by title/genre - returns details)
+* **TMDB API** (search for movies by title/genre - returns details (including poster))
+* **OpenLibrary Covers API** (uses ISBN from Big Book API to search for book covers)
 
