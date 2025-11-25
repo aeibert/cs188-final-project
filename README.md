@@ -33,8 +33,6 @@ People often struggle to pick their next movie or book. **Find Your Next…** so
 * Clean UI with buttons + color themes
 * Posters and book covers
 * Sort by rating
-* Simple search history
-
 
 
 ---
@@ -50,7 +48,6 @@ People often struggle to pick their next movie or book. **Find Your Next…** so
 ### **Backend (Flask)**
 
 * Calls Big Book API + TMDB API
-* Logs searches to SQL Server
 * Maps book genres → movie genres using `GenreMap`
 * Returns recommendations as JSON
 
