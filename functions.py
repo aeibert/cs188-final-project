@@ -2,7 +2,6 @@ import pyodbc
 import os
 from tmdbv3api import TMDb, Movie, Discover, Search
 import bigbookapi
-#from bigbookapi.rest import ApiException
 from dotenv import load_dotenv
 
 if "WEBSITE_HOSTNAME" not in os.environ:
@@ -53,7 +52,7 @@ def recommend_movies_from_movie(movie_title,number):
             results.append({
                 "title": m.title,
                 "year": m.release_date[:4] if hasattr(m, 'release_date') and m.release_date else "N/A",
-                "image": f"https://image.tmdb.org/t/p/w500{m.poster_path}" if m.poster_path else "https://via.placeholder.com/500x750?text=No+Image",
+                "image": f"https://image.tmdb.org/t/p/w500{m.poster_path}" if m.poster_path else "/static/images/image-not-available.jpg",
                 "kind": "Movie"
             })
     except Exception as e:
@@ -64,199 +63,146 @@ def recommend_movies_from_movie(movie_title,number):
 # FLOW 2: BOOK -> BOOK (Using Big Book API Built-in)
 # ===========================================================================
 def recommend_books_from_book(book_title, number):
-    print(f"\n--- 2. Book to Book: '{book_title}' ---")
+    results = []
     try:
         with bigbookapi.ApiClient(book_config) as api_client:
             api_instance = bigbookapi.DefaultApi(api_client)
-            
-            # 1. Find the book ID
+            # 1. Find the source book ID
             search_res = api_instance.search_books(query=book_title, number=1)
-            if not (search_res.get('books') and len(search_res['books'][0]) > 0):
-                print(f"Book '{book_title}' not found.")
-                return
-
-            book_id = search_res['books'][0][0].get('id')
-            print(f"Found Source Book ID: {book_id}")
-
-            # 2. Get similar books
-            similar_res = api_instance.find_similar_books(book_id, number)
             
-            print("Recommendations:")
-            if similar_res.get('similar_books'):
-                for i, b in enumerate(similar_res['similar_books']):
-                    print(f"  {i+1}. {b.get('title')}")
-            else:
-                print("  No similar books found.")
+            if search_res.get('books') and len(search_res['books'][0]) > 0:
+                book_id = search_res['books'][0][0].get('id')
+                
+                # 2. Get similar books (Returns minimal data: ID, Title, Image)
+                similar_res = api_instance.find_similar_books(book_id, number=int(number))
+                
+                if similar_res.get('similar_books'):
+                    for b in similar_res['similar_books']:
+                        
+                        # --- CRITICAL: EXTRA API CALL ---
+                        # Since find_similar_books DOESN'T give us rating/year,
+                        # we MUST ask for it specifically for each book.
+                        try:
+                            details = api_instance.get_book_information(b.get('id'))
+                            meta_text = format_year(details) # Use the detailed info
+                        except:
+                            meta_text = "Similar Book" # Fallback if call fails
+                        # -------------------------------
 
+                        results.append({
+                            "title": b.get('title'),
+                            "year": meta_text,
+                            "image": b.get('image') or "/static/images/image-not-available.jpg",
+                            "kind": "Book"
+                        })
     except Exception as e:
-        print(f"Error in Book->Book: {e}")
-
+        print(f"Error: {e}")
+    return results
 # ===========================================================================
 # FLOW 3: MOVIE -> BOOK (The "Reverse" Logic)
 # 1. Get Movie Genre -> 2. Find matching Book Genre in SQL -> 3. Search Books
 # ===========================================================================
 def recommend_books_from_movie(movie_title, number):
-    print(f"\n--- 3. Movie to Book: '{movie_title}' ---")
+    results = []
     conn = get_db_connection()
-    if not conn: return
+    if not conn: return []
 
     try:
-        # 1. Get Movie Details to find Genre ID
         search_results = search_api.movies(movie_title)
-        if not search_results:
-            print("Movie not found.")
-            return
+        if not search_results: return []
         
-        # We need detailed info to get genres
         movie_details = movie_api.details(search_results[0].id)
-        if not movie_details.genres:
-            print("No genres found for this movie.")
-            return
+        if not movie_details.genres: return []
             
-        # Take the first genre (e.g., 878 for Sci-Fi)
-        first_tmdb_genre = movie_details.genres[0]
-        tmdb_id = first_tmdb_genre['id']
-        tmdb_name = first_tmdb_genre['name']
-        print(f"Movie Genre: {tmdb_name} (ID: {tmdb_id})")
-
-        # 2. Query SQL to convert TMDb ID -> Book Genre Name
-        # We pick the first matching book genre from our map
+        tmdb_id = movie_details.genres[0]['id']
+        
         cursor = conn.cursor()
         cursor.execute("SELECT TOP 1 BookGenreName FROM GenreMap WHERE TMDbGenreID = ?", (tmdb_id,))
         row = cursor.fetchone()
         
-        if not row:
-            print(f"No mapping found in SQL for TMDb ID {tmdb_id}")
-            return
-            
-        book_genre_name = row[0]
-        print(f"Mapped to Book Genre: '{book_genre_name}'")
+        if row:
+            book_genre_name = row[0]
+            with bigbookapi.ApiClient(book_config) as api_client:
+                api_instance = bigbookapi.DefaultApi(api_client)
+                
+                # Search for books by genre (Returns RICH data: ID, Title, Image, Rating, Year!)
+                book_recs = api_instance.search_books(
+                    genres=book_genre_name, 
+                    sort='rating', 
+                    number=int(number)
+                )
+                
+                if book_recs.get('books'):
+                    for group in book_recs['books']:
+                        if group:
+                            b = group[0]
+                            
+                            # --- NO EXTRA CALL NEEDED! ---
+                            # The 'search_books' endpoint already gave us the rating/year!
+                            meta_text = format_year(b)
+                            # -----------------------------
 
-        # 3. Search for popular books in that genre
-        with bigbookapi.ApiClient(book_config) as api_client:
-            api_instance = bigbookapi.DefaultApi(api_client)
-            book_recs = api_instance.search_books(
-                genres=book_genre_name, 
-                sort='rating', 
-                number=number
-            )
-            
-            print("Book Recommendations:")
-            if book_recs.get('books'):
-                for i, group in enumerate(book_recs['books']):
-                    if group:
-                        book = group[0]
-                        title = book.get('title')
-                        
-                        # --- CALL THE HELPER FUNCTION HERE ---
-                        cover_url = get_book_cover_url(book)
-                        # -------------------------------------
-                        
-                        print(f"  {i+1}. {title}")
-                        print(f"     Cover: {cover_url}")
-                        print("-" * 30)
-                # for i, group in enumerate(book_recs['books']):
-                #     if group:
-                #         print(f"  {i+1}. {group[0].get('title')}")
-
+                            results.append({
+                                "title": b.get('title'),
+                                "year": meta_text,
+                                "image": b.get('image') or "/static/images/image-not-available.jpg",
+                                "kind": "Book"
+                            })
     except Exception as e:
-        print(f"Error in Movie->Book: {e}")
+        print(f"Error: {e}")
     finally:
         conn.close()
+    return results
 
 # ===========================================================================
 # FLOW 4: BOOK (Genre) -> MOVIE (The "Dropdown" Logic)
 # 1. User picks Genre -> 2. Find TMDb ID in SQL -> 3. Discover Movies
 # ===========================================================================
 def recommend_movies_from_book(selected_genre, number):
+    results = []
     conn = get_db_connection()
-    if not conn:
-        return {"error": "Database connection error."}
+    if not conn: return []
+
     try:
         genre_clean = selected_genre.lower().strip()
         cursor = conn.cursor()
         cursor.execute("SELECT TMDbGenreID FROM GenreMap WHERE BookGenreName = ?", (genre_clean,))
         row = cursor.fetchone()
-        if not row:
-            return {"error": f"Genre '{selected_genre}' not found in database."}
-        tmdb_id = row[0]
-        recs = discover_api.discover_movies({
-            'with_genres': tmdb_id,
-            'sort_by': 'popularity.desc'
-        })
-        results = []
-        for m in list(recs)[:number]:
-            results.append({
-                "title": m.title,
-                "id": m.id,
-                "poster_path": getattr(m, 'poster_path', None)
-            })
-        return {"recommendations": results}
+        
+        if row:
+            tmdb_id = row[0]
+            recs = discover_api.discover_movies({'with_genres': tmdb_id, 'sort_by': 'popularity.desc'})
+            
+            # Slice the list using 'number'
+            target_list = list(recs)[:int(number)]
+            
+            for m in target_list:
+                results.append({
+                    "title": m.title,
+                    "year": m.release_date[:4] if hasattr(m, 'release_date') and m.release_date else "N/A",
+                    "image": f"https://image.tmdb.org/t/p/w500{m.poster_path}" if m.poster_path else "/static/images/image-not-available.jpg",
+                    "kind": "Movie"
+                })
     except Exception as e:
-        return {"error": f"Error in Book->Movie: {e}"}
+        print(f"Error: {e}")
     finally:
         conn.close()
+    return results
 
-
-# =================================== GET POSTER ========================================
-def get_movie_posters(movie_title):
-    print(f"\n--- Finding Recommendations & Posters for: '{movie_title}' ---")
-    
-    # 1. Find the source movie
-    search_results = search_api.movies(movie_title)
-    if not search_results:
-        print("Movie not found.")
-        return
-
-    first_movie = search_results[0]
-    print(f"Source: {first_movie.title}")
-    
-    # 2. Get recommendations (The poster path is INSIDE these results)
-    recommendations = movie_api.recommendations(first_movie.id)
-    
-    print("\n--- Recommended Movies & Posters ---")
-    
-    # We'll just look at the top 3
-    for i, m in enumerate(list(recommendations)[:3]):
-        title = m.title
-        poster_path = m.poster_path
-        
-        if poster_path:
-            # CONSTRUCT THE FULL URL
-            # w500 is a good size for web apps. You can also use 'w200', 'w300', 'original'
-            full_poster_url = f"https://image.tmdb.org/t/p/w500{poster_path}"
-            
-            print(f"{i+1}. {title}")
-            print(f"   Image Link: {full_poster_url}")
-        else:
-            print(f"{i+1}. {title}")
-            print("   (No poster available)")
-        print("-" * 40)
-
-
-# =================================== GET BOOK COVER ========================================
-
-def get_book_cover_url(book_data):
+def format_year(book_data):
     """
-    Extracts the best available cover URL for a book.
-    Gets ISBN from the book data and constructs the Open Library cover URL.
-    Fallback to a placeholder image if no cover is found.
+    Helper to extract and format only the Year from a book object.
+    Returns a string like "2023" or "N/A"
     """
-
-    # Construct URL using ISBN
-    # This is rate-limited to 100 requests / 5 mins.
-    identifiers = book_data.get('identifiers')
-    if identifiers:
-        # Try ISBN-13 first, then ISBN-10
-        isbn = identifiers.get('isbn_13') or identifiers.get('isbn_10')
+    # 1. Get Year
+    pub_date = book_data.get('publish_date')
+    
+    if pub_date:
+        # Convert 1965.0 -> "1965" and return it directly as a string
+        return str(int(pub_date))
         
-        if isbn:
-            # Construct the URL manually as per Open Library docs
-            return f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg"
-
-    # 3. No cover found
-    return "https://via.placeholder.com/128x192?text=No+Cover"
-
+    # If no date is found, return a fallback string
+    return "N/A"
 
 # =================================== GET POPULAR MOVIES FOR EXPLORE PAGE ========================================
 
@@ -288,9 +234,7 @@ if __name__ == "__main__":
     # # This simulates the user selecting "fantasy" from your dropdown
     #recommend_movies_from_book("fantasy",2)
 
-    # #Test Poster Function
-    # get_movie_posters("Harry Potter and the Sorcerer's Stone")
-
 
     #For explore page at beginning
     #get_popular_movies()
+    
