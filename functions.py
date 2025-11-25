@@ -207,16 +207,23 @@ def format_year(book_data):
 # =================================== GET POPULAR MOVIES FOR EXPLORE PAGE ========================================
 
 def get_popular_movies():
-    movie = Movie()
+    results = []
+    try:
+        movie = Movie()
+        popular = movie.popular()
 
-    popular = movie.popular()
-
-    for p in list(popular)[:4]:
-        print("Title:", p.title)
-        print("Poster Path:", p.poster_path)
-        print("Popularity Rating:", p.popularity)
-        print("Release Date:", p.release_date)
-
+        # Get top 4
+        for p in list(popular)[:4]:
+            results.append({
+                "title": p.title,
+                "year": p.release_date[:4] if hasattr(p, 'release_date') and p.release_date else "N/A",
+                "rating": p.vote_average, # Grab the rating (e.g. 7.8)
+                "poster": f"https://image.tmdb.org/t/p/w500{p.poster_path}" if p.poster_path else "/static/images/image-not-available.jpg",
+                "kind": "Movie"
+            })
+    except Exception as e:
+        print(f"Error getting popular movies: {e}")
+    return results
 # ===========================================================================
 # MAIN EXECUTION
 # ===========================================================================

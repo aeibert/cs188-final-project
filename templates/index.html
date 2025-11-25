@@ -167,189 +167,58 @@
   </main>
 
   <!-- Featured movies -->
-  <section class="featured">
+<section class="featured">
     <div class="card">
       <h2>Featured Movies</h2>
-      <div id="featured-grid" class="featured-grid"></div>
+      
+      <div class="featured-grid">
+        {% if featured_movies %}
+          {% for m in featured_movies %}
+            <a class="movie-card" href="#">
+              <img src="{{ m.poster }}" alt="{{ m.title }}" onerror="this.src='/static/images/image-not-available.jpg'">
+              <h3>{{ m.title }}</h3>
+              <p>
+                {{ m.kind }} • {{ m.year }}<br>
+                Rating: {{ m.rating }}
+              </p>
+            </a>
+          {% endfor %}
+        {% else %}
+          <p>Unable to load popular movies right now.</p>
+        {% endif %}
+      </div>
+      
     </div>
   </section>
 
   <footer>© 2025 Find Your Next…</footer>
 
- <script>
-  // ---------- SAMPLE DATA ----------
-  const SAMPLE_MOVIES = [
-    {
-      id: 'spiderman-nwh',
-      title: 'Spider-Man: No Way Home',
-      year: 2021,
-      rating: 8.3,
-      kind: 'movie',
-      poster: 'https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg',
-      description: 'Peter Parker’s life is turned upside down when a spell gone wrong opens the multiverse, unleashing villains from alternate realities.',
-      genres: ['Action', 'Superhero']
-    },
-    {
-    id: 'dark-knight',
-    title: 'The Dark Knight',
-    year: 2008,
-    rating: 9.0,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
-    description: 'Batman faces the Joker, a criminal mastermind who unleashes chaos on Gotham City, pushing the hero to his limits.',
-    genres: ['Action', 'Crime']
-    },
-    {
-      id: 'avatar-2',
-      title: 'Avatar: The Way of Water',
-      year: 2022,
-      rating: 7.7,
-      kind: 'movie',
-      poster: 'https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg',
-      description: 'Jake Sully and Neytiri must protect their family when a new threat forces them into the oceans of Pandora.',
-      genres: ['Sci-Fi', 'Adventure']
-    },
-      {
-    id: 'barbie-23',
-    title: 'Barbie',
-    year: 2023,
-    rating: 7.2,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg',
-    description: 'Barbie and Ken enter the real world and confront what it truly means to be human.',
-    genres: ['Comedy', 'Fantasy']
-  },
-  {
-    id: 'top-gun-mav',
-    title: 'Top Gun: Maverick',
-    year: 2022,
-    rating: 8.3,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg',
-    description: 'After decades of service, Maverick returns to Top Gun to train elite recruits while facing ghosts of his past.',
-    genres: ['Action', 'Drama']
-  },
-  {
-    id: 'wonka-23',
-    title: 'Wonka',
-    year: 2023,
-    rating: 7.2,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/qhb1qOilapbapxWQn9jtRCMwXJF.jpg',
-    description: 'A young Willy Wonka chases his dream of opening a chocolate shop in this magical musical adventure.',
-    genres: ['Family', 'Fantasy']
-  },
-    {
-    id: 'elemental-23',
-    title: 'Elemental',
-    year: 2023,
-    rating: 7.5,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/8riWcADI1ekEiBguVB9vkilhiQm.jpg',
-    description: 'In a city of fire, water, earth, and air, a fiery girl and a watery boy discover unexpected connection.',
-    genres: ['Animation', 'Romance']
-  },
-  {
-    id: 'wakanda-forever',
-    title: 'Black Panther: Wakanda Forever',
-    year: 2022,
-    rating: 7.1,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/ps2oKfhY6DL3alynlSqY97gHSsg.jpg',
-    description: 'The people of Wakanda fight to protect their nation in the wake of King T’Challa’s death.',
-    genres: ['Action', 'Adventure']
-  },
-    {
-    id: 'gotg-3',
-    title: 'Guardians of the Galaxy Vol. 3',
-    year: 2023,
-    rating: 8.0,
-    kind: 'movie',
-    poster: 'https://image.tmdb.org/t/p/w500/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg',
-    description: 'The Guardians rally to save Rocket and confront painful memories from his past.',
-    genres: ['Action', 'Sci-Fi']
-  }
+<script>
+    // Only keep the UI logic for the dropdowns
+    const inputKind = document.getElementById('inputKind');
+    const targetKind = document.getElementById('targetKind');
+    const q = document.getElementById('q');
+    const genreField = document.getElementById('genreField');
+    const genreSelect = document.getElementById('genre');
 
+    function refreshUI() {
+      const entering = inputKind.value;
+      const recommending = targetKind.value;
+      const isBookToMovie = entering === 'book' && recommending === 'movie';
 
-  ];
+      q.placeholder = entering === 'book' ? 'e.g., The Hobbit' : 'e.g., Interstellar';
 
-  const inputKind = document.getElementById('inputKind');
-  const targetKind = document.getElementById('targetKind');
-  const q = document.getElementById('q');
-  const genreField = document.getElementById('genreField');
-  const genreSelect = document.getElementById('genre');
-
-
-  function refreshUI() {
-  const entering = inputKind.value;
-  const recommending = targetKind.value;
-
-  const isBookToMovie = entering === 'book' && recommending === 'movie';
-
-  // Placeholder
-  q.placeholder = entering === 'book' ? 'e.g., The Hobbit' : 'e.g., Interstellar';
-
-  // Show genre only for Book -> Movie
-  if (isBookToMovie) {
-    genreField.style.display = 'block';
-  } else {
-    genreField.style.display = 'none';
-    genreSelect.value = '';
-  }
-}
-  inputKind.addEventListener('change', refreshUI);
-  targetKind.addEventListener('change', refreshUI);
-
-  refreshUI();
-
-
-  const pretty = x => x === 'book' ? 'Book' : 'Movie';
-
-  // ---------- FEATURED MOVIES RENDERING ----------
-  function setFeaturedMovies(movies = [], opts = {}) {
-    const grid = document.getElementById('featured-grid');
-    if (!grid) return;   // if HTML not found, bail
-
-    const count = opts.count ?? 4;
-    grid.innerHTML = '';
-
-    const pool = [...movies]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, count);
-
-    for (const m of pool) {
-      const card = document.createElement('a');
-      card.className = 'movie-card';
-
-      const qp = new URLSearchParams({
-        id: m.id,
-        kind: m.kind,
-        title: m.title,
-        year: String(m.year || ''),
-        rating: String(m.rating ?? ''),
-        poster: m.poster,
-        desc: m.description,
-        genres: (m.genres || []).join(', ')
-      });
-
-      card.href = `detail.html?${qp.toString()}`;
-
-      card.innerHTML = `
-        <img src="${m.poster}" alt="Movie cover for ${m.title}">
-        <h3>${m.title}</h3>
-        <p>
-          Movie • ${m.year}<br>
-          Rating: ${m.rating}
-        </p>
-      `;
-
-      grid.appendChild(card);
+      if (isBookToMovie) {
+        genreField.style.display = 'block';
+      } else {
+        genreField.style.display = 'none';
+        genreSelect.value = '';
+      }
     }
-  }
 
-  // Wait until DOM is ready so #featured-grid exists
-  document.addEventListener('DOMContentLoaded', () => {
-    refreshUI();                    // set correct placeholder + dropdown logic
-    setFeaturedMovies(SAMPLE_MOVIES, { count: 4 });  // draw the cards
-  });
-</script>
+    inputKind.addEventListener('change', refreshUI);
+    targetKind.addEventListener('change', refreshUI);
+
+    // Run once on load
+    document.addEventListener('DOMContentLoaded', refreshUI);
+  </script>

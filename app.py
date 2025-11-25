@@ -11,7 +11,9 @@ def get_db_connection():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    # Get the data before loading the page
+    popular_movies = functions.get_popular_movies()
+    return render_template("index.html", featured_movies=popular_movies)
 
 @app.route("/recommend")
 def recommend():
