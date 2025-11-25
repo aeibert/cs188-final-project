@@ -23,7 +23,6 @@ def recommend():
     title = request.args.get("q")
     genre = request.args.get("genre")
     
-    # --- FIX IS HERE: Get the 'limit' (show) value ---
     # We convert it to an int so we can pass it to your function
     limit = int(request.args.get("limit", 4)) 
 
@@ -42,7 +41,7 @@ def recommend():
 
     elif input_kind == "book" and target_kind == "movie":
         if genre:
-            results = functions.recommend_movies_from_book(genre, limit)
+            results = functions.recommend_movies_from_genre_dropdown(genre, limit)
         else:
             results = []
 
