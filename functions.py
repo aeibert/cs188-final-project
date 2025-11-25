@@ -6,9 +6,7 @@ from dotenv import load_dotenv
 
 # --- FIX 1: LOAD ENV VARS CORRECTLY ---
 if "WEBSITE_HOSTNAME" not in os.environ:
-    # Development: Try standard .env first
-    load_dotenv() 
-    # Fallback to .secret.env just in case you kept the old name
+    # Development environment
     load_dotenv(".secret.env")
 
 # --- CONFIGURATION ---
@@ -38,11 +36,9 @@ def get_db_connection():
         print(f"Database Connection Error: {e}")
         return None
 
-# --- FIX 2: YEAR ONLY HELPER ---
 def format_meta_info(book_data):
     """
     Returns strictly the year (e.g. "1965") or "N/A".
-    Removes rating logic as requested.
     """
     pub_date = book_data.get('publish_date')
     if pub_date:
@@ -223,9 +219,6 @@ def get_book_details(book_id):
         with bigbookapi.ApiClient(book_config) as api_client:
             api = bigbookapi.DefaultApi(api_client)
             
-            # --- FIX IS HERE ---
-            # Use int(float(...)) to safely convert strings like "123" or "123.0"
-            # into a pure integer 123.
             try:
                 numeric_id = int(float(book_id))
             except ValueError:

@@ -121,6 +121,7 @@ dependencies = [
     { name = "flask-restful" },
     { name = "omdb" },
     { name = "pyodbc" },
+    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "tmdbv3api" },
 ]
@@ -137,6 +138,7 @@ requires-dist = [
     { name = "flask-restful", specifier = ">=0.3.10" },
     { name = "omdb", specifier = ">=0.10.1" },
     { name = "pyodbc", specifier = ">=5.3.0" },
+    { name = "pytest", specifier = ">=8.4.2" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "tmdbv3api", specifier = ">=1.9.0" },
 ]
