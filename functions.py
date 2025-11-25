@@ -4,11 +4,11 @@ from tmdbv3api import TMDb, Movie, Discover, Search
 import bigbookapi
 from dotenv import load_dotenv
 
-# --- FIX 1: LOAD ENV VARS CORRECTLY ---
+# --- FIX 1: LOAD ENV VARS CORRECTLY (some users have different names for the .env file)---
 if "WEBSITE_HOSTNAME" not in os.environ:
-    # Development: Try standard .env first
+    # Try standard .env first
     load_dotenv() 
-    # Fallback to .secret.env just in case you kept the old name
+    # Fallback to .secret.env 
     load_dotenv(".secret.env")
 
 # --- CONFIGURATION ---
@@ -38,7 +38,6 @@ def get_db_connection():
         print(f"Database Connection Error: {e}")
         return None
 
-# --- FIX 2: YEAR ONLY HELPER ---
 def format_meta_info(book_data):
     """
     Returns strictly the year (e.g. "1965") or "N/A".
@@ -54,11 +53,13 @@ def format_meta_info(book_data):
 # RECOMMENDATION FUNCTIONS
 # ===========================================================================
 
+# Movie -> Movie
 def recommend_movies_from_movie(movie_title, number):
     results = []
     try:
         search_results = search_api.movies(movie_title)
-        if not search_results: return []
+        if not search_results: 
+            return []
         first_movie = search_results[0]
         recs = movie_api.recommendations(first_movie.id)
         
@@ -74,6 +75,7 @@ def recommend_movies_from_movie(movie_title, number):
         print(f"Error in Movie->Movie: {e}")
     return results
 
+# Book -> Book
 def recommend_books_from_book(book_title, number):
     results = []
     try:
@@ -87,7 +89,7 @@ def recommend_books_from_book(book_title, number):
                 
                 if similar_res.get('similar_books'):
                     for b in similar_res['similar_books']:
-                        # Extra call for details
+                        # Extra call for details to get year
                         try:
                             details = api_instance.get_book_information(b.get('id'))
                             meta_text = format_meta_info(details)
@@ -105,17 +107,21 @@ def recommend_books_from_book(book_title, number):
         print(f"Error in Book->Book: {e}")
     return results
 
+# Movie -> Book
 def recommend_books_from_movie(movie_title, number):
     results = []
     conn = get_db_connection()
-    if not conn: return []
+    if not conn: 
+        return []
 
     try:
         search_results = search_api.movies(movie_title)
-        if not search_results: return []
+        if not search_results: 
+            return []
         
         movie_details = movie_api.details(search_results[0].id)
-        if not movie_details.genres: return []
+        if not movie_details.genres: 
+            return []
             
         tmdb_id = movie_details.genres[0]['id']
         
@@ -140,16 +146,14 @@ def recommend_books_from_movie(movie_title, number):
                         if group:
                             b = group[0]
                             
-                            # --- FIX: FETCH FULL DETAILS TO GET YEAR ---
+                            # --- fetch full details to get year ---
                             try:
                                 safe_id = int(float(b.get('id')))
                                 details = api_instance.get_book_information(safe_id)
                                 meta_text = format_meta_info(details)
                             except Exception as e:
-                                # Fallback if the extra call fails
+                                # If there is no publish date, default to N/A
                                 meta_text = "N/A"
-                            # -------------------------------------------
-
                             results.append({
                                 "id": b.get('id'),
                                 "title": b.get('title'),
@@ -163,10 +167,12 @@ def recommend_books_from_movie(movie_title, number):
         conn.close()
     return results
 
+# Book -> Movie
 def recommend_movies_from_genre_dropdown(selected_genre, number):
     results = []
     conn = get_db_connection()
-    if not conn: return []
+    if not conn: 
+        return []
     try:
         genre_clean = selected_genre.lower().strip()
         cursor = conn.cursor()
@@ -213,7 +219,8 @@ def get_popular_movies():
 
 def get_movie_details(movie_id):
     try:
-        if not movie_id: return None
+        if not movie_id: 
+            return None
         m = movie_api.details(movie_id)
         return {
             "title": m.title,
@@ -231,14 +238,12 @@ def get_movie_details(movie_id):
 def get_book_details(book_id):
     try:
         # Ensure ID is not empty
-        if not book_id: return None
+        if not book_id: 
+            return None
 
         with bigbookapi.ApiClient(book_config) as api_client:
             api = bigbookapi.DefaultApi(api_client)
-            
-            # --- FIX IS HERE ---
-            # Use int(float(...)) to safely convert strings like "123" or "123.0"
-            # into a pure integer 123.
+            # Use int(float(...)) to safely convert strings like "123" or "123.0" into a pure integer 123.
             try:
                 numeric_id = int(float(book_id))
             except ValueError:
@@ -246,8 +251,7 @@ def get_book_details(book_id):
                 return None
                 
             b = api.get_book_information(numeric_id)
-            # -------------------
-            
+
             year = "N/A"
             if b.get('publish_date'):
                 year = str(int(b['publish_date']))
