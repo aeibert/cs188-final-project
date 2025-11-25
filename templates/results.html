@@ -68,19 +68,26 @@
       </div>
 
       <div id="results" class="grid">
-        {% if recommendations %}
+        {% if error %}
+          <div class="error-box" style="grid-column: 1 / -1; padding: 20px; background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; border-radius: 12px; text-align: center;">
+            <h3>⚠️ Connection Error</h3>
+            <p>{{ error }}</p>
+          </div>
+      
+        {% elif recommendations %}
           {% for item in recommendations %}
             <a class="item" href="{{ url_for('detail', id=item.id, kind=item.kind) }}">
-              <img class="thumb" src="{{ item.image }}" alt="{{ item.title }}" onerror="this.src='https://via.placeholder.com/400x600.png?text=No+Image'">
+              <img class="thumb" src="{{ item.image }}" alt="{{ item.title }}" onerror="this.src='/static/images/image-not-available.jpg'">
               <div class="pad">
                 <div class="title">{{ item.title }}</div>
                 <div class="meta-small">{{ item.kind }} • {{ item.year }}</div>
               </div>
             </a>
           {% endfor %}
+
         {% else %}
-          <div class="empty" style="display:block;">
-            No results yet. Try another search.
+          <div class="empty" style="grid-column: 1 / -1; display:block; padding: 40px; text-align: center; color: #666;">
+            No results found. Try a different search or genre. If you continue to see this error, daily API limits have been reached.
           </div>
         {% endif %}
       </div>

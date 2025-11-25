@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 
 # --- FIX 1: LOAD ENV VARS CORRECTLY ---
 if "WEBSITE_HOSTNAME" not in os.environ:
-    # Development environment
+    # Development: Try standard .env first
+    load_dotenv() 
+    # Fallback to .secret.env just in case you kept the old name
     load_dotenv(".secret.env")
 
 # --- CONFIGURATION ---
@@ -36,9 +38,11 @@ def get_db_connection():
         print(f"Database Connection Error: {e}")
         return None
 
+# --- FIX 2: YEAR ONLY HELPER ---
 def format_meta_info(book_data):
     """
     Returns strictly the year (e.g. "1965") or "N/A".
+    Removes rating logic as requested.
     """
     pub_date = book_data.get('publish_date')
     if pub_date:
@@ -54,8 +58,7 @@ def recommend_movies_from_movie(movie_title, number):
     results = []
     try:
         search_results = search_api.movies(movie_title)
-        if not search_results: 
-            return []
+        if not search_results: return []
         first_movie = search_results[0]
         recs = movie_api.recommendations(first_movie.id)
         
@@ -88,7 +91,7 @@ def recommend_books_from_book(book_title, number):
                         try:
                             details = api_instance.get_book_information(b.get('id'))
                             meta_text = format_meta_info(details)
-                        except Exception:
+                        except:
                             meta_text = "N/A"
 
                         results.append({
@@ -163,8 +166,7 @@ def recommend_books_from_movie(movie_title, number):
 def recommend_movies_from_genre_dropdown(selected_genre, number):
     results = []
     conn = get_db_connection()
-    if not conn: 
-        return []
+    if not conn: return []
     try:
         genre_clean = selected_genre.lower().strip()
         cursor = conn.cursor()
@@ -211,8 +213,7 @@ def get_popular_movies():
 
 def get_movie_details(movie_id):
     try:
-        if not movie_id: 
-            return None
+        if not movie_id: return None
         m = movie_api.details(movie_id)
         return {
             "title": m.title,
@@ -230,12 +231,14 @@ def get_movie_details(movie_id):
 def get_book_details(book_id):
     try:
         # Ensure ID is not empty
-        if not book_id: 
-            return None
+        if not book_id: return None
 
         with bigbookapi.ApiClient(book_config) as api_client:
             api = bigbookapi.DefaultApi(api_client)
             
+            # --- FIX IS HERE ---
+            # Use int(float(...)) to safely convert strings like "123" or "123.0"
+            # into a pure integer 123.
             try:
                 numeric_id = int(float(book_id))
             except ValueError:
