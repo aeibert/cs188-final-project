@@ -3,7 +3,7 @@
 A simple recommendation app that helps users decide **what to watch or read next** using books, movies, and genre-based matching.
 
 # **Contributors**
-* Amelia E., Maia B. Kendall S., Najmo M.
+* Amelia E., Maia B., Kendall S., Najmo M.
 
 ##  What It Does
 

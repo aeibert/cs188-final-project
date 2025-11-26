@@ -17,20 +17,17 @@ def index():
 
 @app.route("/recommend")
 def recommend():
-    # 1. Get all data from the form
+    #Get all data from the form
     input_kind = request.args.get("inputKind")
     target_kind = request.args.get("targetKind")
     title = request.args.get("q")
     genre = request.args.get("genre")
-    
-    # We convert it to an int so we can pass it to your function
-    limit = int(request.args.get("limit", 4)) 
+    limit = int(request.args.get("limit", 4)) # conver to int so we can pass it to the functions
 
     results = []
+    error = None
 
-    # 2. Call the functions, PASSING THE LIMIT
     if input_kind == "movie" and target_kind == "movie":
-        # Pass 'limit' as the second argument here!
         results = functions.recommend_movies_from_movie(title, limit)
 
     elif input_kind == "book" and target_kind == "book":
@@ -45,9 +42,12 @@ def recommend():
         else:
             results = []
 
+    final_results = results[:limit] if results else []
+
     return render_template(
         "results.html", 
-        recommendations=results,
+        recommendations=final_results,
+        error=error,
         q=title,
         genre=genre,
         input_kind=input_kind,
