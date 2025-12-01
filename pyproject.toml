@@ -1,7 +1,7 @@
 [project]
 name = "final-project"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Flask-based movie and book recommendation web app that integrates TMDB, BigBookAPI, and Azure SQL to provide cross-media recommendations, search functionality, and detailed item pages."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
