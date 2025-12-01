@@ -123,6 +123,7 @@ dependencies = [
     { name = "pyodbc" },
     { name = "pytest" },
     { name = "python-dotenv" },
+    { name = "requests" },
     { name = "tmdbv3api" },
 ]
 
@@ -140,6 +141,7 @@ requires-dist = [
     { name = "pyodbc", specifier = ">=5.3.0" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
+    { name = "requests", specifier = ">=2.32.5" },
     { name = "tmdbv3api", specifier = ">=1.9.0" },
 ]
 
