@@ -141,8 +141,7 @@ This project can be deployed using **Azure App Service** to host the Flask backe
 ### **1. Prepare the Project for Deployment**
 Make sure the following files are included in the repository:
 
-- `requirements.txt` — Python dependencies  
-- `startup.txt` or `startup.sh` — tells Azure how to run the app (example below)  
+- `requirements.txt` — Python dependencies   
 - `.secret.env` (NOT committed to GitHub — upload values in Azure instead)
 
 Azure automatically detects Python apps but requires a startup command.
