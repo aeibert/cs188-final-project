@@ -1,199 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="style.css">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Results • Find Your Next…</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg1:#a78bfa; --bg2:#60a5fa; --ink:#1d2230; --muted:#6b7280; --panel:#ffffff;
-      --ring:rgba(96,165,250,.35); --shadow:0 18px 45px rgba(17,24,39,.15); --radius:18px;
-      --btn:#5b55f7; --btn-hover:#4a44ea; --border:#e7e9f0;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;}
-
-    /* Hero */
-    header{color:#fff; padding:72px 16px 120px; text-align:center;}
-    header h1{font-family:'Poppins',sans-serif; font-weight:700; margin:0 0 8px; font-size:40px; letter-spacing:.3px}
-    header p{margin:0; opacity:.95; font-size:16px}
-
-    /* Floating content card */
-    .wrap{max-width:1100px; margin:-84px auto 40px; padding:0 18px;}
-    .card{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--border); padding:26px;}
-
-    /* Summary row */
-    .summary{display:flex; gap:18px; align-items:center; justify-content:space-between; flex-wrap:wrap;}
-    .summary h2{font-family:'Poppins',sans-serif; margin:6px 0; font-size:24px; color:#4438ca}
-    .meta{color:var(--muted); font-size:13px}
-    .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#eef2ff; color:#3730a3; border:1px solid #c7d2fe; font-size:12px}
-
-    /* Controls */
-    .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    select{padding:10px 12px; border-radius:10px; border:1px solid var(--border); outline:none; background:#fff}
-    select:focus{box-shadow:0 0 0 6px var(--ring)}
-    .back{padding:10px 16px; border-radius:12px; background:#fff; color:#4f46e5; text-decoration:none; font-weight:700; border:1px solid var(--border)}
-    .back:hover{filter:brightness(.98)}
-
-    /* Grid */
-    .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px; margin-top:16px}
-    .item{background:linear-gradient(180deg,#ffffff,#f9fafb); border:1px solid #eef; border-radius:16px; overflow:hidden; box-shadow:0 10px 25px rgba(0,0,0,.06)}
-    .thumb{width:100%; aspect-ratio:2/3; object-fit:cover; background:#e5e7eb}
-    .pad{padding:12px}
-    .title{font-weight:700; margin:2px 0}
-
-    .empty{color:var(--muted); font-style:italic; text-align:center; padding:24px}
-    footer{padding:32px 12px 48px; text-align:center; color:#fff; opacity:.9}
-
-    @media (max-width:900px){ header h1{font-size:34px} }
-  </style>
 </head>
 <body>
   <header>
     <h1>Find Your Next…</h1>
-    <p id="heroLine">Results tailored to your search</p>
+    <p id="heroLine">
+      {% if q or genre %}
+        You entered a {{ input_kind|capitalize }}: “{{ q if q else genre }}”. We’re recommending {{ target_kind|capitalize }}s.
+      {% else %}
+        Results based off your search
+      {% endif %}
+    </p>
   </header>
 
   <main class="wrap">
-    <section class="card" aria-live="polite">
+    <section class="card">
       <div class="summary">
-        <div>
+        <div class="summary-main">
           <h2>Recommendations</h2>
-          <div id="summaryText" class="meta">Preparing your results…</div>
+          <div id="summaryText" class="meta">
+            {% if recommendations %}
+              Showing top {{ limit }} {{ target_kind|capitalize }} recommendations.
+            {% else %}
+              No results found.
+            {% endif %}
+          </div>
+
+          <div id="pills" class="pills-row">
+            {% if q %}
+              <span class="pill">Query: {{ q }}</span>
+            {% endif %}
+            {% if genre %}
+              <span class="pill">Genre: {{ genre }}</span>
+            {% endif %}
+            <span class="pill">{{ input_kind|capitalize }} → {{ target_kind|capitalize }}</span>
+          </div>
         </div>
-        <div class="controls">
-          <a class="back" href="index.html">← Back to search</a>
-          <label class="meta" for="sort">Sort</label>
-          <select id="sort" aria-label="Sort results">
-            <option value="relevance">Relevance</option>
-            <option value="rating-desc">Rating ↓</option>
-            <option value="year-desc">Year ↓</option>
-          </select>
-          <label class="meta" for="limit">Show</label>
-          <select id="limit" aria-label="Number of results to show">
-            <option value="3">3</option>
-            <option value="6" selected>6</option>
-            <option value="9">9</option>
-            <option value="12">12</option>
-          </select>
+
+        <div class="summary-toolbar">
+          <a class="back-link" href="/">← Back to search</a>
+
+          <div class="controls">
+            <div class="control-group">
+              <span class="control-label">Show</span>
+              <form action="/recommend" method="get" style="display:inline;">
+                <input type="hidden" name="inputKind" value="{{ input_kind }}">
+                <input type="hidden" name="targetKind" value="{{ target_kind }}">
+                <input type="hidden" name="q" value="{{ q }}">
+                <input type="hidden" name="genre" value="{{ genre }}">
+                
+                <select id="limit" name="limit" onchange="this.form.submit()" aria-label="Number of results to show">
+                  <option value="3" {% if limit == 3 %}selected{% endif %}>3</option>
+                  <option value="4" {% if limit == 4 %}selected{% endif %}>4</option>
+                  <option value="9" {% if limit == 9 %}selected{% endif %}>9</option>
+                  <option value="12" {% if limit == 12 %}selected{% endif %}>12</option>
+                </select>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap" id="pills"></div>
+      <div id="results" class="grid">
+        {% if error %}
+          <div class="error-box" style="grid-column: 1 / -1; padding: 20px; background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; border-radius: 12px; text-align: center;">
+            <h3>⚠️ Connection Error</h3>
+            <p>{{ error }}</p>
+          </div>
+      
+        {% elif recommendations %}
+          {% for item in recommendations %}
+            <a class="item" href="{{ url_for('detail', id=item.id, kind=item.kind) }}">
+              <img class="thumb" src="{{ item.image }}" alt="{{ item.title }}" onerror="this.src='/static/images/image-not-available.jpg'">
+              <div class="pad">
+                <div class="title">{{ item.title }}</div>
+                <div class="meta-small">{{ item.kind }} • {{ item.year }}</div>
+              </div>
+            </a>
+          {% endfor %}
 
-      <div id="results" class="grid"></div>
-      <div id="empty" class="empty" style="display:none">No results yet. Try another search.</div>
+        {% else %}
+          <div class="empty" style="grid-column: 1 / -1; display:block; padding: 40px; text-align: center; color: #666;">
+            No results found. Try a different search or genre. If you continue to see this error, daily API limits have been reached.
+          </div>
+        {% endif %}
+      </div>
+      
     </section>
   </main>
 
   <footer>© 2025 Find Your Next…</footer>
-
-  <script>
-    // Read URL params
-    const params = new URLSearchParams(location.search);
-    const q = (params.get('q') || '').trim();
-    const inputKind = (params.get('inputKind') || 'book').toLowerCase();
-    const targetKind = (params.get('targetKind') || 'movie').toLowerCase();
-    const initialLimit = Math.max(1, parseInt(params.get('limit') || '12', 10));
-
-    // Elements
-    const heroLine = document.getElementById('heroLine');
-    const summaryText = document.getElementById('summaryText');
-    const pills = document.getElementById('pills');
-    const resultsEl = document.getElementById('results');
-    const emptyEl = document.getElementById('empty');
-    const sortSel = document.getElementById('sort');
-    const limitSel = document.getElementById('limit');
-
-    const pretty = x => (x === 'book' ? 'Book' : 'Movie');
-
-    // Header + summary
-    heroLine.textContent = q
-      ? `You entered a ${pretty(inputKind)}: “${q}”. We’re recommending ${pretty(targetKind)}s.`
-      : 'Results tailored to your search';
-    summaryText.textContent = q
-      ? `Showing ${pretty(targetKind)} recommendations related to “${q}”.`
-      : 'Showing sample recommendations.';
-
-    // Pills
-    function addPill(text){ const s=document.createElement('span'); s.className='pill'; s.textContent=text; pills.appendChild(s); }
-    if (q) addPill(`Query: ${q}`);
-    addPill(`${pretty(inputKind)} → ${pretty(targetKind)}`);
-
-    // Demo items so the page shows cards before wiring real APIs
-    let items = [
-      { title: 'Sample One',   year: 2024, rating: 8.6, kind: targetKind, poster: 'https://via.placeholder.com/400x600.png?text=Cover' },
-      { title: 'Sample Two',   year: 2022, rating: 8.2, kind: targetKind, poster: 'https://via.placeholder.com/400x600.png?text=Cover' },
-      { title: 'Sample Three', year: 2020, rating: 7.9, kind: targetKind, poster: 'https://via.placeholder.com/400x600.png?text=Cover' },
-      { title: 'Sample Four',  year: 2019, rating: 7.4, kind: targetKind, poster: 'https://via.placeholder.com/400x600.png?text=Cover' },
-      { title: 'Sample Five',  year: 2017, rating: 7.1, kind: targetKind, poster: 'https://via.placeholder.com/400x600.png?text=Cover' },
-      { title: 'Sample Six',   year: 2015, rating: 6.8, kind: targetKind, poster: 'https://via.placeholder.com/400x600.png?text=Cover' }
-    ];
-
-    function sortBy(list, how){
-      switch(how){
-        case 'rating-desc': return [...list].sort((a,b)=>(b.rating??-1)-(a.rating??-1));
-        case 'year-desc':   return [...list].sort((a,b)=>(b.year??-1)-(a.year??-1));
-        default:            return list;
-      }
-    }
-
-    function render(list, limit){
-      resultsEl.innerHTML='';
-      const slice = list.slice(0, limit);
-      if (!slice.length){ emptyEl.style.display='block'; return; }
-      emptyEl.style.display='none';
-      for (const it of slice) {
-        const a = document.createElement('a');
-        a.className = 'item';
-        // Build the URL to detail page with query params
-        const qp = new URLSearchParams({
-          kind: it.kind,
-          id: it.id || '',                 // later: real OMDb imdbID or BigBook id
-          title: it.title,
-          year: String(it.year || ''),
-          rating: String(it.rating ?? ''),
-          poster: it.poster || '',
-          desc: it.description || 'A great story awaits…',
-          genres: (it.genres || []).join(', ')
-        });
-        a.href = `detail.html?${qp.toString()}`;
-
-        // Card body
-        const img = document.createElement('img');
-        img.className = 'thumb';
-        img.alt = `${pretty(it.kind)} cover for ${it.title}`;
-        img.src = it.poster;
-
-        const pad = document.createElement('div'); pad.className = 'pad';
-        const t = document.createElement('div'); t.className = 'title'; t.textContent = it.title;
-        const m = document.createElement('div'); m.className = 'meta'; m.textContent = `${pretty(it.kind)} • ${it.year || ''}`;
-        const r = document.createElement('div'); r.className = 'meta'; r.textContent = (it.rating != null) ? `Rating: ${it.rating}` : '';
-
-        pad.append(t, m, r);
-        a.append(img, pad);
-        resultsEl.append(a);
-      }
-
-          }
-
-    // Wire controls
-    sortSel.addEventListener('change', ()=>{
-      render(sortBy(items, sortSel.value), parseInt(limitSel.value,10));
-    });
-    limitSel.addEventListener('change', ()=>{
-      const p = new URLSearchParams(location.search); p.set('limit', limitSel.value);
-      history.replaceState(null, '', `${location.pathname}?${p.toString()}`);
-      render(sortBy(items, sortSel.value), parseInt(limitSel.value,10));
-    });
-
-    // Initial paint
-    limitSel.value = String(initialLimit);
-    render(sortBy(items, sortSel.value), initialLimit);
-  </script>
 </body>
 </html>

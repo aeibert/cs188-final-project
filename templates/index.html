@@ -1,43 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="stylesheet" href="style.css">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Find Your Next…</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}">
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg1:#a78bfa; --bg2:#60a5fa; --ink:#1d2230; --muted:#6b7280; --panel:#ffffff;
-      --ring:rgba(96,165,250,.35); --shadow:0 18px 45px rgba(17,24,39,.15); --radius:18px;
-      --btn:#5b55f7; --btn-hover:#4a44ea; --border:#e7e9f0;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:var(--ink); background:linear-gradient(135deg,var(--bg1),var(--bg2)) fixed;}
-
-    header{color:#fff; padding:72px 16px 120px; text-align:center;}
-    header h1{font-family:'Poppins',sans-serif; font-weight:700; margin:0 0 8px; font-size:56px; letter-spacing:.3px}
-    header p{margin:0; opacity:.95; font-size:18px}
-
-    .wrap{max-width:1040px; margin:-84px auto 40px; padding:0 18px;}
-    .card{background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--border); padding:26px;}
-
-    .search-head{font-family:'Poppins',sans-serif; text-align:center; font-size:26px; margin:6px 0 18px; color:#4438ca}
-    .search-form{display:grid; grid-template-columns:1fr 1fr 3fr auto auto; gap:12px; align-items:end}
-    .field label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
-    select,input{width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border); outline:none; background:#fff; font-size:16px}
-    select:focus,input:focus{box-shadow:0 0 0 6px var(--ring)}
-    .btn{padding:13px 22px; border-radius:12px; border:none; background:var(--btn); color:#fff; font-weight:700; cursor:pointer; transition:.15s transform ease, .2s filter;}
-    .btn:hover{background:var(--btn-hover); transform:translateY(-1px)}
-
-    .micro{margin-top:8px; color:var(--muted); font-size:12px; text-align:center}
-
-    footer{padding:32px 12px 48px; text-align:center; color:#fff; opacity:.9}
-
-    @media (max-width:900px){ .search-form{grid-template-columns:1fr; header h1{font-size:44px}} }
-  </style>
 </head>
 <body>
   <header>
@@ -49,137 +18,207 @@
     <section class="card">
       <h2 class="search-head">What are you looking for?</h2>
 
-      <form class="search-form" action="results.html" method="get" novalidate>
+      <form class="search-form" action="/recommend" method="get" novalidate>
+
+        <!-- I'm entering -->
         <div class="field">
           <label for="inputKind">I'm entering</label>
           <select id="inputKind" name="inputKind">
-            <option value="book">Book</option>
             <option value="movie">Movie</option>
+            <option value="book">Book</option>
           </select>
         </div>
       
+        <!-- Recommend me -->
         <div class="field">
           <label for="targetKind">Recommend me</label>
           <select id="targetKind" name="targetKind">
             <option value="book">Books</option>
-            <option value="movie">Movies</option>
+            <option value="movie" selected>Movies</option>
           </select>
         </div>
       
+        <!-- Title -->
         <div class="field">
           <label for="q">Title</label>
           <input id="q" name="q" type="text" placeholder="Enter your favorite title…" required />
         </div>
       
+        <!-- How many -->
         <div class="field">
           <label for="limit">Show</label>
           <select id="limit" name="limit">
             <option value="3">3</option>
-            <option value="6" selected>6</option>
+            <option value="4" selected>4</option>
             <option value="9">9</option>
             <option value="12">12</option>
           </select>
         </div>
       
+        <!-- GENRE DROPDOW` N (hidden unless Book -> Movies) -->
+        <div class="field" id="genreField" style="display:none;">
+          <label for="genre">Genre / Subject</label>
+          <select id="genre" name="genre">
+            <option value="">Select a Genre</option>
+            <option value="action">Action</option>
+            <option value="adventure">Adventure</option>
+            <option value="anthropology">Anthropology</option>
+            <option value="astronomy">Astronomy</option>
+            <option value="archaeology">Archaeology</option>
+            <option value="architecture">Architecture</option>
+            <option value="art">Art</option>
+            <option value="aviation">Aviation</option>
+            <option value="biography">Biography</option>
+            <option value="biology">Biology</option>
+            <option value="business">Business</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="children">Children</option>
+            <option value="classics">Classics</option>
+            <option value="contemporary">Contemporary</option>
+            <option value="cookbook">Cookbook</option>
+            <option value="crafts">Crafts</option>
+            <option value="crime">Crime</option>
+            <option value="dystopia">Dystopia</option>
+            <option value="economics">Economics</option>
+            <option value="education">Education</option>
+            <option value="engineering">Engineering</option>
+            <option value="environment">Environment</option>
+            <option value="erotica">Erotica</option>
+            <option value="essay">Essay</option>
+            <option value="fairy tales">Fairy Tales</option>
+            <option value="fantasy">Fantasy</option>
+            <option value="fashion">Fashion</option>
+            <option value="feminism">Feminism</option>
+            <option value="fiction">Fiction</option>
+            <option value="finance">Finance</option>
+            <option value="folklore">Folklore</option>
+            <option value="food">Food</option>
+            <option value="gaming">Gaming</option>
+            <option value="gardening">Gardening</option>
+            <option value="geography">Geography</option>
+            <option value="geology">Geology</option>
+            <option value="graphic novel">Graphic Novel</option>
+            <option value="health">Health</option>
+            <option value="historical">Historical</option>
+            <option value="historical fiction">Historical Fiction</option>
+            <option value="history">History</option>
+            <option value="horror">Horror</option>
+            <option value="how to">How To</option>
+            <option value="humor">Humor</option>
+            <option value="inspirational">Inspirational</option>
+            <option value="journalism">Journalism</option>
+            <option value="law">Law</option>
+            <option value="literary fiction">Literary Fiction</option>
+            <option value="literature">Literature</option>
+            <option value="magical realism">Magical Realism</option>
+            <option value="manga">Manga</option>
+            <option value="martial arts">Martial Arts</option>
+            <option value="mathematics">Mathematics</option>
+            <option value="medicine">Medicine</option>
+            <option value="medieval">Medieval</option>
+            <option value="memoir">Memoir</option>
+            <option value="mystery">Mystery</option>
+            <option value="mythology">Mythology</option>
+            <option value="nature">Nature</option>
+            <option value="nonfiction">Nonfiction</option>
+            <option value="novel">Novel</option>
+            <option value="occult">Occult</option>
+            <option value="paranormal">Paranormal</option>
+            <option value="parenting">Parenting</option>
+            <option value="philosophy">Philosophy</option>
+            <option value="physics">Physics</option>
+            <option value="picture book">Picture Book</option>
+            <option value="poetry">Poetry</option>
+            <option value="politics">Politics</option>
+            <option value="programming">Programming</option>
+            <option value="psychology">Psychology</option>
+            <option value="reference">Reference</option>
+            <option value="relationships">Relationships</option>
+            <option value="religion">Religion</option>
+            <option value="romance">Romance</option>
+            <option value="science and technology">Science and Technology</option>
+            <option value="science fiction">Science Fiction</option>
+            <option value="self help">Self Help</option>
+            <option value="short stories">Short Stories</option>
+            <option value="society">Society</option>
+            <option value="sociology">Sociology</option>
+            <option value="space">Space</option>
+            <option value="spirituality">Spirituality</option>
+            <option value="sports">Sports</option>
+            <option value="text book">Text Book</option>
+            <option value="thriller">Thriller</option>
+            <option value="travel">Travel</option>
+            <option value="true crime">True Crime</option>
+            <option value="war">War</option>
+            <option value="writing">Writing</option>
+            <option value="young adult">Young Adult</option>
+          </select>
+        </div>
+      
+        <!-- Submit -->
         <button class="btn" type="submit">Search</button>
       </form>
       
 
-      <p class="micro">Tip: Enter a <em>Book</em> and get <em>Movie</em> recs — or the other way around!</p>
+      <p class="micro">
+        Tip: Try entering <em>Interstellar</em>, <em>Dune:Part Two</em>, <em>La La Land</em>, or <em>Spider-Man: No Way Home</em> to see how the site behaves.
+      </p>
     </section>
   </main>
 
+  <!-- Featured movies -->
+<section class="featured">
+    <div class="card">
+      <h2>Featured Movies</h2>
+      
+      <div class="featured-grid">
+        {% if featured_movies %}
+          {% for m in featured_movies %}
+            <a class="movie-card" href="{{ url_for('detail', id=m.id, kind='movie') }}">
+              <img src="{{ m.poster }}" alt="{{ m.title }}" onerror="this.src='/static/images/image-not-available.jpg'">
+              <h3>{{ m.title }}</h3>
+              <p>
+                {{ m.kind }} • {{ m.year }}<br>
+                Rating: {{ m.rating }}
+              </p>
+            </a>
+          {% endfor %}
+        {% else %}
+          <p>Unable to load popular movies right now.</p>
+        {% endif %}
+      </div>
+      
+    </div>
+  </section>
+
   <footer>© 2025 Find Your Next…</footer>
 
-  <script>
+<script>
+    // Only keep the UI logic for the dropdowns
     const inputKind = document.getElementById('inputKind');
     const targetKind = document.getElementById('targetKind');
     const q = document.getElementById('q');
+    const genreField = document.getElementById('genreField');
+    const genreSelect = document.getElementById('genre');
 
-    function refreshUI(){
+    function refreshUI() {
       const entering = inputKind.value;
+      const recommending = targetKind.value;
+      const isBookToMovie = entering === 'book' && recommending === 'movie';
+
       q.placeholder = entering === 'book' ? 'e.g., The Hobbit' : 'e.g., Interstellar';
-      if (targetKind.value === entering){
-        targetKind.value = entering === 'book' ? 'movie' : 'book';
+
+      if (isBookToMovie) {
+        genreField.style.display = 'block';
+      } else {
+        genreField.style.display = 'none';
+        genreSelect.value = '';
       }
     }
+
     inputKind.addEventListener('change', refreshUI);
-    refreshUI();
+    targetKind.addEventListener('change', refreshUI);
+
+    // Run once on load
+    document.addEventListener('DOMContentLoaded', refreshUI);
   </script>
-
-<section class="featured">
-  <h2>Featured Movies</h2>
-  <div id="featured-container">
-    <img id="featured-poster" src="" alt="Movie Poster" />
-    <h3 id="featured-title"></h3>
-    <p id="featured-plot"></p>
-  </div>
-</section>
-<section class="featured">
-  <h2>Featured Movies</h2>
-  <div id="featured-grid" class="featured-grid" aria-live="polite">
-    <!-- cards will be injected here -->
-  </div>
-</section>
-
-<script>
-  /**
-   * Call this AFTER your API returns movies.
-   * @param {Array<{id?:string, kind?:'movie'|'book', title:string, plot?:string, poster?:string}>} movies
-   * @param {Object} opts
-   * @param {number} opts.count  how many to show (default 3)
-   * @param {boolean} opts.autoplay  reshuffle every N ms (default false)
-   * @param {number} opts.interval  ms between reshuffles (default 7000)
-   */
-  function setFeaturedMovies(movies = [], opts = {}) {
-    const grid = document.getElementById('featured-grid');
-    if (!grid) return;
-
-    const count = opts.count ?? 3;
-    const autoplay = opts.autoplay ?? false;
-    const interval = opts.interval ?? 7000;
-
-    function draw() {
-      grid.innerHTML = '';
-      // shuffle, then take N
-      const pool = [...movies].sort(() => Math.random() - 0.5).slice(0, count);
-
-      for (const m of pool) {
-        const card = document.createElement('a');
-        card.className = 'movie-card';
-        // build detail link (works before real IDs too)
-        const qp = new URLSearchParams({
-          kind: m.kind || 'movie',
-          id: m.id || '',
-          title: m.title || '',
-          poster: m.poster || '',
-          desc: (m.plot || '').slice(0, 240),
-        });
-        card.href = `detail.html?${qp.toString()}`;
-
-        card.innerHTML = `
-          <img src="${m.poster || 'https://via.placeholder.com/400x600.png?text=Poster'}"
-               alt="${m.title ? m.title + ' poster' : 'Poster'}">
-          <h3>${m.title || 'Untitled'}</h3>
-          <p>${m.plot ? m.plot : ''}</p>
-        `;
-        grid.appendChild(card);
-      }
-    }
-
-    draw();
-    if (autoplay) {
-      setInterval(draw, interval);
-    }
-  }
-
-  // Example usage (delete after wiring your API):
-  // fetch('/your-endpoint').then(r => r.json()).then(data => {
-  //   setFeaturedMovies(data.movies, { count: 3, autoplay: true, interval: 7000 });
-  // });
-</script>
-
-
-
-</body>
-</html>
