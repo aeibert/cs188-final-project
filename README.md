@@ -100,9 +100,11 @@ Create a file named:
 
 Inside it, add your API keys and Azure connection string:
 
-AZURE_SQL_CONNECTIONSTRING=your-connection-string-here
-TMDB_API_KEY=your-tmdb-api-key
-BIGBOOK_API_KEY=your-bigbook-api-key
+- AZURE_SQL_CONNECTIONSTRING=your-connection-string-here
+
+- TMDB_API_KEY=your-tmdb-api-key
+
+- BIGBOOK_API_KEY=your-bigbook-api-key
 
 
 These values are required for the app to connect to APIs and the database.
@@ -155,9 +157,11 @@ In the Azure Portal, go to:
 
 Add the following keys:
 
-AZURE_SQL_CONNECTIONSTRING
-TMDB_API_KEY
-BIGBOOK_API_KEY
+- AZURE_SQL_CONNECTIONSTRING
+
+- TMDB_API_KEY
+
+- BIGBOOK_API_KEY
 
 ### **4. Deploy the Code**
 
@@ -174,4 +178,5 @@ Once deployed, Azure will build your environment, install dependencies, and star
 
 Azure will provide a URL:
 
-https://<your-app-name>.azurewebsites.net
+https://\<your-app-name\>.azurewebsites.net
+
