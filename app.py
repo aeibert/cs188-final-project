@@ -22,7 +22,7 @@ def recommend():
     target_kind = request.args.get("targetKind")
     title = request.args.get("q")
     genre = request.args.get("genre")
-    limit = int(request.args.get("limit", 4)) # conver to int so we can pass it to the functions
+    limit = int(request.args.get("limit", 4)) # convert to int so we can pass it to the functions
 
     results = []
     error = None
